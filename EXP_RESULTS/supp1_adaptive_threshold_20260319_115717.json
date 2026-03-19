@@ -1,0 +1,133 @@
+{
+  "adaptive_threshold": 0.6333,
+  "c1_fair_distribution": {
+    "median": 0.6333,
+    "mean": 0.6868,
+    "std": 0.1794,
+    "n_scores": 288,
+    "min": 0.3486,
+    "max": 0.9802
+  },
+  "ofs_comparison": {
+    "C1_fair": {
+      "fixed_0.5": {
+        "ofs_score": 0.4583,
+        "matches": 132,
+        "total": 288,
+        "per_expert_ofs": {
+          "RSK_TALEB_001": 0.5,
+          "MAC_DALIO_001": 0.3333,
+          "MAC_MARKS_001": 0.1667,
+          "RSK_SHANNON_001": 0.75,
+          "GRO_FISHER_001": 0.5833,
+          "GRO_SOROS_001": 0.375,
+          "VAL_MUNGER_001": 0.25,
+          "MAC_SIMONS_001": 0.1667,
+          "RSK_THORP_001": 0.75,
+          "GRO_LYNCH_001": 0.375,
+          "VAL_GRAHAM_001": 1.0,
+          "VAL_BUFFETT_001": 0.25
+        }
+      },
+      "adaptive_0.633": {
+        "ofs_score": 0.8229,
+        "matches": 237,
+        "total": 288,
+        "per_expert_ofs": {
+          "RSK_TALEB_001": 0.5,
+          "MAC_DALIO_001": 0.8333,
+          "MAC_MARKS_001": 1.0,
+          "RSK_SHANNON_001": 1.0,
+          "GRO_FISHER_001": 0.9167,
+          "GRO_SOROS_001": 1.0,
+          "VAL_MUNGER_001": 0.75,
+          "MAC_SIMONS_001": 0.1667,
+          "RSK_THORP_001": 1.0,
+          "GRO_LYNCH_001": 0.75,
+          "VAL_GRAHAM_001": 0.9583,
+          "VAL_BUFFETT_001": 1.0
+        }
+      }
+    },
+    "C2": {
+      "fixed_0.5": {
+        "ofs_score": 0.8183,
+        "matches": 707,
+        "total": 864,
+        "per_expert_ofs": {
+          "VAL_GRAHAM_001": 0.7917,
+          "VAL_BUFFETT_001": 1.0,
+          "VAL_MUNGER_001": 0.9722,
+          "GRO_FISHER_001": 0.8194,
+          "GRO_LYNCH_001": 0.7778,
+          "GRO_SOROS_001": 0.7222,
+          "MAC_DALIO_001": 1.0,
+          "MAC_MARKS_001": 0.875,
+          "MAC_SIMONS_001": 0.8333,
+          "RSK_TALEB_001": 0.7917,
+          "RSK_SHANNON_001": 0.9028,
+          "RSK_THORP_001": 0.3333
+        }
+      },
+      "adaptive_0.633": {
+        "ofs_score": 0.7755,
+        "matches": 670,
+        "total": 864,
+        "per_expert_ofs": {
+          "VAL_GRAHAM_001": 0.75,
+          "VAL_BUFFETT_001": 0.9167,
+          "VAL_MUNGER_001": 0.9167,
+          "GRO_FISHER_001": 0.5417,
+          "GRO_LYNCH_001": 0.6528,
+          "GRO_SOROS_001": 0.7639,
+          "MAC_DALIO_001": 0.9722,
+          "MAC_MARKS_001": 0.8333,
+          "MAC_SIMONS_001": 0.9583,
+          "RSK_TALEB_001": 0.7917,
+          "RSK_SHANNON_001": 0.9583,
+          "RSK_THORP_001": 0.25
+        }
+      }
+    },
+    "C3_fair": {
+      "fixed_0.5": {
+        "ofs_score": 0.5139,
+        "matches": 148,
+        "total": 288,
+        "per_expert_ofs": {
+          "RSK_TALEB_001": 0.5,
+          "MAC_DALIO_001": 0.3333,
+          "GRO_LYNCH_001": 0.375,
+          "GRO_FISHER_001": 0.5833,
+          "MAC_SIMONS_001": 0.8333,
+          "GRO_SOROS_001": 0.375,
+          "MAC_MARKS_001": 0.1667,
+          "VAL_GRAHAM_001": 1.0,
+          "VAL_MUNGER_001": 0.25,
+          "RSK_SHANNON_001": 0.75,
+          "VAL_BUFFETT_001": 0.25,
+          "RSK_THORP_001": 0.75
+        }
+      },
+      "adaptive_0.633": {
+        "ofs_score": 0.8785,
+        "matches": 253,
+        "total": 288,
+        "per_expert_ofs": {
+          "RSK_TALEB_001": 0.5,
+          "MAC_DALIO_001": 0.8333,
+          "GRO_LYNCH_001": 0.75,
+          "GRO_FISHER_001": 0.9167,
+          "MAC_SIMONS_001": 0.8333,
+          "GRO_SOROS_001": 1.0,
+          "MAC_MARKS_001": 1.0,
+          "VAL_GRAHAM_001": 0.9583,
+          "VAL_MUNGER_001": 0.75,
+          "RSK_SHANNON_001": 1.0,
+          "VAL_BUFFETT_001": 1.0,
+          "RSK_THORP_001": 1.0
+        }
+      }
+    }
+  }
+}

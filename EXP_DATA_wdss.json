@@ -1,0 +1,259 @@
+{
+  "meta": {
+    "description": "H-PIOS Worldview Deliberation Experiment — 24 Scenario Matrix (6 macro × 4 asset)",
+    "version": "2.0",
+    "created": "2026-03-14",
+    "updated": "2026-03-18",
+    "changes": "v2.0: Added 6 asset-level metrics (Fisher/Soros/Taleb/Shannon) + 7 macro_metrics per regime (Dalio/Marks/Simons)"
+  },
+
+  "macro_regimes": {
+    "M1_BOOM": {
+      "label": "Liquidity Boom",
+      "market_regime": "Bull_Market",
+      "regime_confidence": 0.92,
+      "description": "QE-driven euphoria, low rates, VIX < 15",
+      "macro_metrics": {
+        "VIX_Index": 12,
+        "OAS_Spread_Zscore": 0.3,
+        "Yield_Curve_Spread_10Y_2Y": 1.8,
+        "Credit_Spread_High_Yield_Volatility": 0.5,
+        "M2_Money_Supply_YoY": 0.08,
+        "Price_Mean_Reversion_Zscore": 0.5,
+        "Order_Book_Imbalance_Ratio": 0.52
+      }
+    },
+    "M2_STAGFLATION": {
+      "label": "Stagflation",
+      "market_regime": "Stagflation",
+      "regime_confidence": 0.78,
+      "description": "High inflation + low growth, policy confusion",
+      "macro_metrics": {
+        "VIX_Index": 28,
+        "OAS_Spread_Zscore": 1.5,
+        "Yield_Curve_Spread_10Y_2Y": 0.2,
+        "Credit_Spread_High_Yield_Volatility": 1.8,
+        "M2_Money_Supply_YoY": 0.01,
+        "Price_Mean_Reversion_Zscore": -0.8,
+        "Order_Book_Imbalance_Ratio": 0.48
+      }
+    },
+    "M3_CRISIS": {
+      "label": "Liquidity Crisis",
+      "market_regime": "Liquidity_Crisis",
+      "regime_confidence": 0.95,
+      "description": "Credit crunch, bank panic, VIX > 40",
+      "macro_metrics": {
+        "VIX_Index": 45,
+        "OAS_Spread_Zscore": 3.2,
+        "Yield_Curve_Spread_10Y_2Y": -0.5,
+        "Credit_Spread_High_Yield_Volatility": 3.0,
+        "M2_Money_Supply_YoY": -0.02,
+        "Price_Mean_Reversion_Zscore": -3.5,
+        "Order_Book_Imbalance_Ratio": 0.85
+      }
+    },
+    "M4_STEADY": {
+      "label": "Steady Growth",
+      "market_regime": "Normal_Market",
+      "regime_confidence": 0.85,
+      "description": "Goldilocks — moderate growth, low volatility",
+      "macro_metrics": {
+        "VIX_Index": 15,
+        "OAS_Spread_Zscore": 0.5,
+        "Yield_Curve_Spread_10Y_2Y": 1.2,
+        "Credit_Spread_High_Yield_Volatility": 0.8,
+        "M2_Money_Supply_YoY": 0.05,
+        "Price_Mean_Reversion_Zscore": 0.2,
+        "Order_Book_Imbalance_Ratio": 0.51
+      }
+    },
+    "M5_MANIA": {
+      "label": "Narrative Mania",
+      "market_regime": "Late_Bull_Market",
+      "regime_confidence": 0.88,
+      "description": "AI hype / meme frenzy, FOMO, extreme greed",
+      "macro_metrics": {
+        "VIX_Index": 18,
+        "OAS_Spread_Zscore": 0.8,
+        "Yield_Curve_Spread_10Y_2Y": 0.8,
+        "Credit_Spread_High_Yield_Volatility": 1.0,
+        "M2_Money_Supply_YoY": 0.07,
+        "Price_Mean_Reversion_Zscore": 1.5,
+        "Order_Book_Imbalance_Ratio": 0.55
+      }
+    },
+    "M6_DEFLATION": {
+      "label": "Deflationary Recession",
+      "market_regime": "Recession",
+      "regime_confidence": 0.90,
+      "description": "Falling prices, demand collapse, despair",
+      "macro_metrics": {
+        "VIX_Index": 35,
+        "OAS_Spread_Zscore": 2.5,
+        "Yield_Curve_Spread_10Y_2Y": -0.3,
+        "Credit_Spread_High_Yield_Volatility": 2.2,
+        "M2_Money_Supply_YoY": -0.01,
+        "Price_Mean_Reversion_Zscore": -2.8,
+        "Order_Book_Imbalance_Ratio": 0.78
+      }
+    }
+  },
+
+  "asset_profiles": {
+    "A1_QUALITY": {
+      "label": "The Boring Fortress",
+      "ticker": "QUALITY_STOCK",
+      "description": "A predictable industry leader facing a growth plateau. While its balance sheet is a 'fortress', its organic growth is decelerating to inflation levels. This creates a classic dilemma: Graham appreciates the low risk/low price, but Soros and Lynch argue the 'Growth Narrative' has expired, making it a potential 'Dead Money' asset.",
+      "metrics": {
+        "P/E_Ratio": 12.5,
+        "Price_to_NCAV": 1.05,
+        "ROIC_10yr_Avg": 0.22,
+        "Debt_to_Equity": 0.02,
+        "FCF_Yield": 0.065,
+        "Gross_Margin_Volatility": 0.003,
+        "PEG_Ratio": 1.15,
+        "EPS_Growth_TTM": 0.042,
+        "Expected_Value_of_Signal": 0.48,
+        "Historical_Win_Rate_of_Signal": 0.68,
+        "Price_Trend_R_Squared": 0.92,
+        "SKEW_Index": 102,
+        "Beta": 0.65,
+        "RnD_to_Revenue_Ratio": 0.03,
+        "Operating_Margin_Expansion_3yr": -0.01,
+        "Price_Momentum_1yr_Percentile": 0.45,
+        "Price_to_Fundamental_Divergence_Zscore": 0.3,
+        "OTM_Put_Option_Volume_Spike": 0.5,
+        "Intraday_Volatility_vs_Daily_Return": 0.8
+      }
+    },
+    "A2_BALANCED": {
+      "label": "The Pivot Candidate",
+      "ticker": "BALANCED_STOCK",
+      "description": "A mature company attempting a radical business model pivot into high-tech services. Historical metrics are stable, but R&D spending is suppressing current FCF. Lynch sees the 'Turnaround' potential, while Taleb fears the 'Fragility' of the transition and the risk of capital destruction if the pivot fails.",
+      "metrics": {
+        "P/E_Ratio": 28.0,
+        "Price_to_NCAV": 4.2,
+        "ROIC_10yr_Avg": 0.11,
+        "Debt_to_Equity": 0.55,
+        "FCF_Yield": 0.022,
+        "Gross_Margin_Volatility": 0.06,
+        "PEG_Ratio": 1.45,
+        "EPS_Growth_TTM": 0.12,
+        "Expected_Value_of_Signal": 0.55,
+        "Historical_Win_Rate_of_Signal": 0.52,
+        "Price_Trend_R_Squared": 0.55,
+        "SKEW_Index": 128,
+        "Beta": 1.15,
+        "RnD_to_Revenue_Ratio": 0.12,
+        "Operating_Margin_Expansion_3yr": 0.03,
+        "Price_Momentum_1yr_Percentile": 0.60,
+        "Price_to_Fundamental_Divergence_Zscore": 1.2,
+        "OTM_Put_Option_Volume_Spike": 1.2,
+        "Intraday_Volatility_vs_Daily_Return": 1.8
+      }
+    },
+    "A3_TOXIC": {
+      "label": "The Seductive Value Trap",
+      "ticker": "TOXIC_STOCK",
+      "description": "Quantitatively irresistible but qualitatively terminal. Trading at a massive discount to net cash (NCAV), triggering every Graham-style value alarm. However, its debt structure is opaque, and industry disruption is accelerating. This is the ultimate battleground between 'Margin of Safety' (Graham) and 'Tail Risk' (Taleb).",
+      "metrics": {
+        "P/E_Ratio": 2.8,
+        "Price_to_NCAV": 0.15,
+        "ROIC_10yr_Avg": 0.015,
+        "Debt_to_Equity": 2.25,
+        "FCF_Yield": 0.18,
+        "Gross_Margin_Volatility": 0.15,
+        "PEG_Ratio": 0.18,
+        "EPS_Growth_TTM": -0.22,
+        "Expected_Value_of_Signal": 0.28,
+        "Historical_Win_Rate_of_Signal": 0.32,
+        "Price_Trend_R_Squared": 0.12,
+        "SKEW_Index": 165,
+        "Beta": 1.65,
+        "RnD_to_Revenue_Ratio": 0.005,
+        "Operating_Margin_Expansion_3yr": -0.08,
+        "Price_Momentum_1yr_Percentile": 0.15,
+        "Price_to_Fundamental_Divergence_Zscore": -1.5,
+        "OTM_Put_Option_Volume_Spike": 3.5,
+        "Intraday_Volatility_vs_Daily_Return": 3.5
+      }
+    },
+    "A4_HYPE": {
+      "label": "The Reflexive Peak",
+      "ticker": "HYPE_STOCK",
+      "description": "The epicenter of a parabolic narrative mania. Price growth is feeding the story, which further inflates the price. Soros recognizes the 'Reflexivity' and suggests riding the trend, but the extreme beta and lack of fundamental anchor make it a target for Taleb's 'Black Swan' warnings. A high-stakes ideological clash.",
+      "metrics": {
+        "P/E_Ratio": 185.0,
+        "Price_to_NCAV": 35.0,
+        "ROIC_10yr_Avg": 0.025,
+        "Debt_to_Equity": 1.15,
+        "FCF_Yield": -0.15,
+        "Gross_Margin_Volatility": 0.25,
+        "PEG_Ratio": 0.72,
+        "EPS_Growth_TTM": 2.85,
+        "Expected_Value_of_Signal": 0.98,
+        "Historical_Win_Rate_of_Signal": 0.75,
+        "Price_Trend_R_Squared": 0.99,
+        "SKEW_Index": 178,
+        "Beta": 2.80,
+        "RnD_to_Revenue_Ratio": 0.35,
+        "Operating_Margin_Expansion_3yr": 0.15,
+        "Price_Momentum_1yr_Percentile": 0.98,
+        "Price_to_Fundamental_Divergence_Zscore": 3.8,
+        "OTM_Put_Option_Volume_Spike": 4.2,
+        "Intraday_Volatility_vs_Daily_Return": 1.2
+      }
+    }
+  },
+
+  "user_goals": {
+    "G1_PRESERVE": {
+      "label": "Capital Preservation",
+      "investment_objective": "Preserve my capital at all costs. Avoid any risk of loss.",
+      "parsed_objective": {"strategy": "capital_preservation", "horizon_days": 120}
+    },
+    "G2_VALUE": {
+      "label": "Long-term Value Accumulation",
+      "investment_objective": "Accumulate undervalued quality companies for at least 3 years.",
+      "parsed_objective": {"strategy": "value_accumulation", "horizon_days": 756}
+    },
+    "G3_GROWTH": {
+      "label": "Aggressive Growth",
+      "investment_objective": "Chase high-growth tech opportunities aggressively. Maximize return.",
+      "parsed_objective": {"strategy": "growth_momentum", "horizon_days": 180}
+    },
+    "G4_INCOME": {
+      "label": "Dividend Income",
+      "investment_objective": "Generate stable dividend income with safe blue-chip stocks.",
+      "parsed_objective": {"strategy": "dividend_income", "horizon_days": 504}
+    }
+  },
+
+  "scenarios": {
+    "S01": {"macro": "M1_BOOM",        "asset": "A1_QUALITY", "label": "Boom + Quality"},
+    "S02": {"macro": "M1_BOOM",        "asset": "A2_BALANCED", "label": "Boom + Balanced"},
+    "S03": {"macro": "M1_BOOM",        "asset": "A3_TOXIC",   "label": "Boom + Toxic Trap"},
+    "S04": {"macro": "M1_BOOM",        "asset": "A4_HYPE",    "label": "Boom + Hype Stock"},
+    "S05": {"macro": "M2_STAGFLATION", "asset": "A1_QUALITY", "label": "Stagflation + Quality"},
+    "S06": {"macro": "M2_STAGFLATION", "asset": "A2_BALANCED", "label": "Stagflation + Balanced"},
+    "S07": {"macro": "M2_STAGFLATION", "asset": "A3_TOXIC",   "label": "Stagflation + Toxic Trap"},
+    "S08": {"macro": "M2_STAGFLATION", "asset": "A4_HYPE",    "label": "Stagflation + Hype Stock"},
+    "S09": {"macro": "M3_CRISIS",      "asset": "A1_QUALITY", "label": "Crisis + Quality"},
+    "S10": {"macro": "M3_CRISIS",      "asset": "A2_BALANCED", "label": "Crisis + Balanced"},
+    "S11": {"macro": "M3_CRISIS",      "asset": "A3_TOXIC",   "label": "Crisis + Toxic Trap"},
+    "S12": {"macro": "M3_CRISIS",      "asset": "A4_HYPE",    "label": "Crisis + Hype Stock"},
+    "S13": {"macro": "M4_STEADY",      "asset": "A1_QUALITY", "label": "Steady + Quality"},
+    "S14": {"macro": "M4_STEADY",      "asset": "A2_BALANCED", "label": "Steady + Balanced"},
+    "S15": {"macro": "M4_STEADY",      "asset": "A3_TOXIC",   "label": "Steady + Toxic Trap"},
+    "S16": {"macro": "M4_STEADY",      "asset": "A4_HYPE",    "label": "Steady + Hype Stock"},
+    "S17": {"macro": "M5_MANIA",       "asset": "A1_QUALITY", "label": "Mania + Quality"},
+    "S18": {"macro": "M5_MANIA",       "asset": "A2_BALANCED", "label": "Mania + Balanced"},
+    "S19": {"macro": "M5_MANIA",       "asset": "A3_TOXIC",   "label": "Mania + Toxic Trap"},
+    "S20": {"macro": "M5_MANIA",       "asset": "A4_HYPE",    "label": "Mania + Hype Stock"},
+    "S21": {"macro": "M6_DEFLATION",   "asset": "A1_QUALITY", "label": "Deflation + Quality"},
+    "S22": {"macro": "M6_DEFLATION",   "asset": "A2_BALANCED", "label": "Deflation + Balanced"},
+    "S23": {"macro": "M6_DEFLATION",   "asset": "A3_TOXIC",   "label": "Deflation + Toxic Trap"},
+    "S24": {"macro": "M6_DEFLATION",   "asset": "A4_HYPE",    "label": "Deflation + Hype Stock"}
+  }
+}

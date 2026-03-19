@@ -1,0 +1,28 @@
+{
+  "c2_taf_score": 0.3333,
+  "correct": 1,
+  "total": 3,
+  "details": [
+    {
+      "ablation": "c2_no_graham",
+      "predicted_direction": "decrease",
+      "actual_direction": "decrease",
+      "description": "Removing Graham should decrease Value domain mean score on A3_TOXIC",
+      "correct": true
+    },
+    {
+      "ablation": "c2_no_taleb",
+      "predicted_direction": "increase",
+      "actual_direction": "decrease",
+      "description": "Removing Taleb persona should increase ensemble on A3/A4",
+      "correct": false
+    },
+    {
+      "ablation": "c2_no_risk",
+      "predicted_direction": "increase",
+      "actual_direction": "decrease",
+      "description": "Removing all Risk personas should increase score variance",
+      "correct": false
+    }
+  ]
+}

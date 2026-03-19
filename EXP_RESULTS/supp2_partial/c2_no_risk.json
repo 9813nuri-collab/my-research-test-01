@@ -1,0 +1,458 @@
+[
+  {
+    "scenario_id": "S01",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.09,
+      "VAL_BUFFETT_001": 0.5,
+      "VAL_MUNGER_001": 0.7,
+      "GRO_FISHER_001": 0.0,
+      "GRO_LYNCH_001": 0.28,
+      "GRO_SOROS_001": 0.95,
+      "MAC_DALIO_001": 0.0,
+      "MAC_MARKS_001": 0.0,
+      "MAC_SIMONS_001": 0.15
+    },
+    "ensemble_signal": 0.18695413029894165,
+    "timestamp": "2026-03-19T03:50:35.126542+00:00"
+  },
+  {
+    "scenario_id": "S02",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.0,
+      "VAL_BUFFETT_001": 0.3,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.47,
+      "GRO_LYNCH_001": 0.31,
+      "GRO_SOROS_001": 0.21,
+      "MAC_DALIO_001": 0.0,
+      "MAC_MARKS_001": 0.0,
+      "MAC_SIMONS_001": 0.16
+    },
+    "ensemble_signal": 0.04783489329400627,
+    "timestamp": "2026-03-19T03:51:06.250905+00:00"
+  },
+  {
+    "scenario_id": "S03",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.35,
+      "VAL_BUFFETT_001": 0.0,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.0,
+      "GRO_LYNCH_001": 0.41,
+      "GRO_SOROS_001": 0.95,
+      "MAC_DALIO_001": 0.0,
+      "MAC_MARKS_001": 0.0,
+      "MAC_SIMONS_001": 0.14
+    },
+    "ensemble_signal": 0.12955974860961825,
+    "timestamp": "2026-03-19T03:51:37.080113+00:00"
+  },
+  {
+    "scenario_id": "S04",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.0,
+      "VAL_BUFFETT_001": 0.0,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.47,
+      "GRO_LYNCH_001": 0.54,
+      "GRO_SOROS_001": 0.94,
+      "MAC_DALIO_001": 0.0,
+      "MAC_MARKS_001": 0.0,
+      "MAC_SIMONS_001": 0.12
+    },
+    "ensemble_signal": 0.12005688384008278,
+    "timestamp": "2026-03-19T03:52:08.033684+00:00"
+  },
+  {
+    "scenario_id": "S05",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.16,
+      "VAL_BUFFETT_001": 0.5,
+      "VAL_MUNGER_001": 0.7,
+      "GRO_FISHER_001": 0.0,
+      "GRO_LYNCH_001": 0.18,
+      "GRO_SOROS_001": 0.12,
+      "MAC_DALIO_001": 0.41,
+      "MAC_MARKS_001": 0.32,
+      "MAC_SIMONS_001": 0.18
+    },
+    "ensemble_signal": 0.1391312306477508,
+    "timestamp": "2026-03-19T03:52:38.564067+00:00"
+  },
+  {
+    "scenario_id": "S06",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.0,
+      "VAL_BUFFETT_001": 0.0,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.23,
+      "GRO_LYNCH_001": 0.2,
+      "GRO_SOROS_001": 0.95,
+      "MAC_DALIO_001": 0.41,
+      "MAC_MARKS_001": 0.25,
+      "MAC_SIMONS_001": 0.14
+    },
+    "ensemble_signal": 0.19101455431443753,
+    "timestamp": "2026-03-19T03:53:10.323108+00:00"
+  },
+  {
+    "scenario_id": "S07",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.53,
+      "VAL_BUFFETT_001": 0.0,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.0,
+      "GRO_LYNCH_001": 0.04,
+      "GRO_SOROS_001": 0.08,
+      "MAC_DALIO_001": 0.4,
+      "MAC_MARKS_001": 0.24,
+      "MAC_SIMONS_001": 0.14
+    },
+    "ensemble_signal": 0.04949184396620227,
+    "timestamp": "2026-03-19T03:53:41.000617+00:00"
+  },
+  {
+    "scenario_id": "S08",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.0,
+      "VAL_BUFFETT_001": 0.03,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.23,
+      "GRO_LYNCH_001": 0.63,
+      "GRO_SOROS_001": 0.5,
+      "MAC_DALIO_001": 0.41,
+      "MAC_MARKS_001": 0.47,
+      "MAC_SIMONS_001": 0.18
+    },
+    "ensemble_signal": 0.07059995412663027,
+    "timestamp": "2026-03-19T03:54:11.787113+00:00"
+  },
+  {
+    "scenario_id": "S09",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.25,
+      "VAL_BUFFETT_001": 0.65,
+      "VAL_MUNGER_001": 0.01,
+      "GRO_FISHER_001": 0.0,
+      "GRO_LYNCH_001": 0.08,
+      "GRO_SOROS_001": 0.0,
+      "MAC_DALIO_001": 0.96,
+      "MAC_MARKS_001": 0.92,
+      "MAC_SIMONS_001": 0.82
+    },
+    "ensemble_signal": 0.303385960387994,
+    "timestamp": "2026-03-19T03:54:42.873346+00:00"
+  },
+  {
+    "scenario_id": "S10",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.2,
+      "VAL_BUFFETT_001": 0.23,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.59,
+      "GRO_LYNCH_001": 1.0,
+      "GRO_SOROS_001": 0.17,
+      "MAC_DALIO_001": 0.96,
+      "MAC_MARKS_001": 0.58,
+      "MAC_SIMONS_001": 0.82
+    },
+    "ensemble_signal": 0.5399651824052648,
+    "timestamp": "2026-03-19T03:55:13.468382+00:00"
+  },
+  {
+    "scenario_id": "S11",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.79,
+      "VAL_BUFFETT_001": 0.01,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.0,
+      "GRO_LYNCH_001": 0.127,
+      "GRO_SOROS_001": 0.0,
+      "MAC_DALIO_001": 0.85,
+      "MAC_MARKS_001": 0.85,
+      "MAC_SIMONS_001": 0.5
+    },
+    "ensemble_signal": 0.15969420900007208,
+    "timestamp": "2026-03-19T03:55:43.258895+00:00"
+  },
+  {
+    "scenario_id": "S12",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.0,
+      "VAL_BUFFETT_001": 0.05,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.59,
+      "GRO_LYNCH_001": 0.24,
+      "GRO_SOROS_001": 0.61,
+      "MAC_DALIO_001": 1.0,
+      "MAC_MARKS_001": 0.63,
+      "MAC_SIMONS_001": 0.88
+    },
+    "ensemble_signal": 0.3430887423399668,
+    "timestamp": "2026-03-19T03:56:14.486494+00:00"
+  },
+  {
+    "scenario_id": "S13",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.6,
+      "VAL_BUFFETT_001": 0.67,
+      "VAL_MUNGER_001": 0.7,
+      "GRO_FISHER_001": 0.0,
+      "GRO_LYNCH_001": 0.18,
+      "GRO_SOROS_001": 0.21,
+      "MAC_DALIO_001": 0.0,
+      "MAC_MARKS_001": 0.0,
+      "MAC_SIMONS_001": 0.0
+    },
+    "ensemble_signal": 0.05517033361536485,
+    "timestamp": "2026-03-19T03:56:45.634612+00:00"
+  },
+  {
+    "scenario_id": "S14",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.0,
+      "VAL_BUFFETT_001": 0.26,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.59,
+      "GRO_LYNCH_001": 1.0,
+      "GRO_SOROS_001": 0.5,
+      "MAC_DALIO_001": 0.0,
+      "MAC_MARKS_001": 0.0,
+      "MAC_SIMONS_001": 0.5
+    },
+    "ensemble_signal": 0.21132868577267905,
+    "timestamp": "2026-03-19T03:57:16.338768+00:00"
+  },
+  {
+    "scenario_id": "S15",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.53,
+      "VAL_BUFFETT_001": 0.0,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.0,
+      "GRO_LYNCH_001": 0.08,
+      "GRO_SOROS_001": 0.0,
+      "MAC_DALIO_001": 0.0,
+      "MAC_MARKS_001": 0.0,
+      "MAC_SIMONS_001": 0.06
+    },
+    "ensemble_signal": 0.016435206352821693,
+    "timestamp": "2026-03-19T03:57:46.342035+00:00"
+  },
+  {
+    "scenario_id": "S16",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 1.0,
+      "VAL_BUFFETT_001": 0.05,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.59,
+      "GRO_LYNCH_001": 0.5,
+      "GRO_SOROS_001": 0.95,
+      "MAC_DALIO_001": 0.0,
+      "MAC_MARKS_001": 0.0,
+      "MAC_SIMONS_001": 0.5
+    },
+    "ensemble_signal": 0.3204212647189622,
+    "timestamp": "2026-03-19T03:58:17.391235+00:00"
+  },
+  {
+    "scenario_id": "S17",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.09,
+      "VAL_BUFFETT_001": 0.65,
+      "VAL_MUNGER_001": 0.7,
+      "GRO_FISHER_001": 0.0,
+      "GRO_LYNCH_001": 0.22,
+      "GRO_SOROS_001": 0.45,
+      "MAC_DALIO_001": 0.0,
+      "MAC_MARKS_001": 0.16,
+      "MAC_SIMONS_001": 0.55
+    },
+    "ensemble_signal": 0.0947569624934012,
+    "timestamp": "2026-03-19T03:58:47.996248+00:00"
+  },
+  {
+    "scenario_id": "S18",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.0,
+      "VAL_BUFFETT_001": 0.0,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 1.0,
+      "GRO_LYNCH_001": 0.18,
+      "GRO_SOROS_001": 0.47,
+      "MAC_DALIO_001": 0.0,
+      "MAC_MARKS_001": 0.0,
+      "MAC_SIMONS_001": 0.11
+    },
+    "ensemble_signal": 0.1650858712717244,
+    "timestamp": "2026-03-19T03:59:19.922675+00:00"
+  },
+  {
+    "scenario_id": "S19",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.35,
+      "VAL_BUFFETT_001": 0.01,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.0,
+      "GRO_LYNCH_001": 0.08,
+      "GRO_SOROS_001": 0.08,
+      "MAC_DALIO_001": 0.0,
+      "MAC_MARKS_001": 0.0,
+      "MAC_SIMONS_001": 0.0
+    },
+    "ensemble_signal": 0.020542409010320034,
+    "timestamp": "2026-03-19T03:59:51.716315+00:00"
+  },
+  {
+    "scenario_id": "S20",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.0,
+      "VAL_BUFFETT_001": 0.15,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.59,
+      "GRO_LYNCH_001": 0.41,
+      "GRO_SOROS_001": 0.95,
+      "MAC_DALIO_001": 0.0,
+      "MAC_MARKS_001": 0.0,
+      "MAC_SIMONS_001": 0.5
+    },
+    "ensemble_signal": 0.1579103723980443,
+    "timestamp": "2026-03-19T04:00:22.495309+00:00"
+  },
+  {
+    "scenario_id": "S21",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.33,
+      "VAL_BUFFETT_001": 0.65,
+      "VAL_MUNGER_001": 0.7,
+      "GRO_FISHER_001": 0.0,
+      "GRO_LYNCH_001": 0.16,
+      "GRO_SOROS_001": 0.5,
+      "MAC_DALIO_001": 0.68,
+      "MAC_MARKS_001": 0.51,
+      "MAC_SIMONS_001": 0.38
+    },
+    "ensemble_signal": 0.17650828272430996,
+    "timestamp": "2026-03-19T04:00:53.417183+00:00"
+  },
+  {
+    "scenario_id": "S22",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.5,
+      "VAL_BUFFETT_001": 0.24,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.12,
+      "GRO_LYNCH_001": 0.04,
+      "GRO_SOROS_001": 0.5,
+      "MAC_DALIO_001": 0.68,
+      "MAC_MARKS_001": 0.32,
+      "MAC_SIMONS_001": 0.42
+    },
+    "ensemble_signal": 0.10944328721158306,
+    "timestamp": "2026-03-19T04:01:24.205176+00:00"
+  },
+  {
+    "scenario_id": "S23",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.59,
+      "VAL_BUFFETT_001": 0.01,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.0,
+      "GRO_LYNCH_001": 0.0,
+      "GRO_SOROS_001": 0.5,
+      "MAC_DALIO_001": 0.68,
+      "MAC_MARKS_001": 0.76,
+      "MAC_SIMONS_001": 0.18
+    },
+    "ensemble_signal": 0.06495934689835625,
+    "timestamp": "2026-03-19T04:01:54.865592+00:00"
+  },
+  {
+    "scenario_id": "S24",
+    "condition": "C2_ablation_c2_no_risk",
+    "ablation": "c2_no_risk",
+    "repetition": 1,
+    "expert_scores": {
+      "VAL_GRAHAM_001": 0.0,
+      "VAL_BUFFETT_001": 0.05,
+      "VAL_MUNGER_001": 0.0,
+      "GRO_FISHER_001": 0.59,
+      "GRO_LYNCH_001": 0.24,
+      "GRO_SOROS_001": 0.92,
+      "MAC_DALIO_001": 0.68,
+      "MAC_MARKS_001": 0.76,
+      "MAC_SIMONS_001": 0.48
+    },
+    "ensemble_signal": 0.22116639310421204,
+    "timestamp": "2026-03-19T04:02:26.398209+00:00"
+  }
+]

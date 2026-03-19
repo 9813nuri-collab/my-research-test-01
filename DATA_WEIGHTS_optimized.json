@@ -1,0 +1,528 @@
+{
+  "schema": "H-PIOS_v8.5_Optimized_Weights",
+  "version": "2.1.0",
+  "nodes": {
+    "graham": {
+      "historical_win_rate": {
+        "original": 0.62,
+        "optimized": 0.604583,
+        "change_pct": -2.49,
+        "bounds": [
+          0.496,
+          0.744
+        ],
+        "status": "optimized"
+      },
+      "decay_factor": {
+        "original": 0.85,
+        "optimized": 0.828863,
+        "change_pct": -2.49,
+        "bounds": [
+          0.68,
+          1.02
+        ],
+        "status": "optimized"
+      }
+    },
+    "buffett": {
+      "historical_win_rate": {
+        "original": 0.68,
+        "optimized": 0.665599,
+        "change_pct": -2.12,
+        "bounds": [
+          0.544,
+          0.816
+        ],
+        "status": "optimized"
+      },
+      "decay_factor": {
+        "original": 0.95,
+        "optimized": 0.929881,
+        "change_pct": -2.12,
+        "bounds": [
+          0.76,
+          1.14
+        ],
+        "status": "optimized"
+      }
+    },
+    "munger": {
+      "historical_win_rate": {
+        "original": 0.71,
+        "optimized": 0.680142,
+        "change_pct": -4.21,
+        "bounds": [
+          0.568,
+          0.852
+        ],
+        "status": "optimized"
+      },
+      "decay_factor": {
+        "original": 0.98,
+        "optimized": 0.938788,
+        "change_pct": -4.21,
+        "bounds": [
+          0.784,
+          1.176
+        ],
+        "status": "optimized"
+      }
+    },
+    "fisher": {
+      "historical_win_rate": {
+        "original": 0.65,
+        "optimized": 0.638188,
+        "change_pct": -1.82,
+        "bounds": [
+          0.52,
+          0.78
+        ],
+        "status": "optimized"
+      },
+      "decay_factor": {
+        "original": 0.9,
+        "optimized": 0.883645,
+        "change_pct": -1.82,
+        "bounds": [
+          0.72,
+          1.08
+        ],
+        "status": "optimized"
+      }
+    },
+    "lynch": {
+      "historical_win_rate": {
+        "original": 0.69,
+        "optimized": 0.674546,
+        "change_pct": -2.24,
+        "bounds": [
+          0.552,
+          0.828
+        ],
+        "status": "optimized"
+      },
+      "decay_factor": {
+        "original": 0.92,
+        "optimized": 0.899394,
+        "change_pct": -2.24,
+        "bounds": [
+          0.736,
+          1.104
+        ],
+        "status": "optimized"
+      }
+    },
+    "soros": {
+      "historical_win_rate": {
+        "original": 0.58,
+        "optimized": 0.569521,
+        "change_pct": -1.81,
+        "bounds": [
+          0.464,
+          0.696
+        ],
+        "status": "optimized"
+      },
+      "decay_factor": {
+        "original": 0.96,
+        "optimized": 0.942656,
+        "change_pct": -1.81,
+        "bounds": [
+          0.768,
+          1.152
+        ],
+        "status": "optimized"
+      }
+    },
+    "dalio": {
+      "historical_win_rate": {
+        "original": 0.72,
+        "optimized": 0.704142,
+        "change_pct": -2.2,
+        "bounds": [
+          0.576,
+          0.864
+        ],
+        "status": "optimized"
+      },
+      "decay_factor": {
+        "original": 0.95,
+        "optimized": 0.929077,
+        "change_pct": -2.2,
+        "bounds": [
+          0.76,
+          1.14
+        ],
+        "status": "optimized"
+      }
+    },
+    "marks": {
+      "historical_win_rate": {
+        "original": 0.68,
+        "optimized": 0.663578,
+        "change_pct": -2.41,
+        "bounds": [
+          0.544,
+          0.816
+        ],
+        "status": "optimized",
+        "protection": "taleb_inertia_10x"
+      },
+      "decay_factor": {
+        "original": 0.93,
+        "optimized": 0.90754,
+        "change_pct": -2.42,
+        "bounds": [
+          0.744,
+          1.116
+        ],
+        "status": "optimized",
+        "protection": "taleb_inertia_10x"
+      }
+    },
+    "simons": {
+      "historical_win_rate": {
+        "original": 0.55,
+        "optimized": 0.539526,
+        "change_pct": -1.9,
+        "bounds": [
+          0.44,
+          0.66
+        ],
+        "status": "optimized"
+      },
+      "decay_factor": {
+        "original": 0.99,
+        "optimized": 0.971147,
+        "change_pct": -1.9,
+        "bounds": [
+          0.792,
+          1.188
+        ],
+        "status": "optimized"
+      }
+    },
+    "taleb": {
+      "historical_win_rate": {
+        "original": 0.99,
+        "optimized": 0.99,
+        "change_pct": 0.0,
+        "bounds": [
+          0.792,
+          1.188
+        ],
+        "status": "preserved",
+        "protection": "taleb_inertia_10x"
+      },
+      "decay_factor": {
+        "original": 1.0,
+        "optimized": 1.0,
+        "change_pct": 0.0,
+        "bounds": [
+          0.8,
+          1.2
+        ],
+        "status": "preserved",
+        "protection": "taleb_inertia_10x"
+      }
+    },
+    "shannon": {
+      "historical_win_rate": {
+        "original": 0.7,
+        "optimized": 0.706816,
+        "change_pct": 0.97,
+        "bounds": [
+          0.56,
+          0.84
+        ],
+        "status": "preserved"
+      },
+      "decay_factor": {
+        "original": 0.97,
+        "optimized": 0.979445,
+        "change_pct": 0.97,
+        "bounds": [
+          0.776,
+          1.164
+        ],
+        "status": "preserved"
+      }
+    },
+    "thorp": {
+      "historical_win_rate": {
+        "original": 0.82,
+        "optimized": 0.828409,
+        "change_pct": 1.03,
+        "bounds": [
+          0.656,
+          0.984
+        ],
+        "status": "optimized"
+      },
+      "decay_factor": {
+        "original": 0.98,
+        "optimized": 0.99005,
+        "change_pct": 1.03,
+        "bounds": [
+          0.784,
+          1.176
+        ],
+        "status": "optimized"
+      }
+    }
+  },
+  "attribution": {
+    "taleb": {
+      "node_type": "Risk",
+      "primary_horizon": 5,
+      "T5_win_rate": 0.3987,
+      "T5_avg_signal": 0.1,
+      "T5_attribution": -1.599339,
+      "T5_n_signals": 1866,
+      "T20_win_rate": 0.3231,
+      "T20_avg_signal": 0.1002,
+      "T20_attribution": -6.738693,
+      "T20_n_signals": 1851,
+      "T60_win_rate": 0.2518,
+      "T60_avg_signal": 0.1008,
+      "T60_attribution": -19.258937,
+      "T60_n_signals": 1811,
+      "best_fit_regime": "Black_Swan",
+      "best_fit_win_rate": 0.6486
+    },
+    "dalio": {
+      "node_type": "Macro",
+      "primary_horizon": 20,
+      "T5_win_rate": 0.3907,
+      "T5_avg_signal": 0.1697,
+      "T5_attribution": -1.694477,
+      "T5_n_signals": 1866,
+      "T20_win_rate": 0.3085,
+      "T20_avg_signal": 0.1697,
+      "T20_attribution": -6.738079,
+      "T20_n_signals": 1851,
+      "T60_win_rate": 0.2347,
+      "T60_avg_signal": 0.1718,
+      "T60_attribution": -18.62685,
+      "T60_n_signals": 1811,
+      "best_fit_regime": "Geopolitical_Stagflation",
+      "best_fit_win_rate": 0.7778
+    },
+    "shannon": {
+      "node_type": "Risk",
+      "primary_horizon": 5,
+      "T5_win_rate": 0.5847,
+      "T5_avg_signal": 0.754,
+      "T5_attribution": 0.794648,
+      "T5_n_signals": 1866,
+      "T20_win_rate": 0.6472,
+      "T20_avg_signal": 0.7543,
+      "T20_attribution": 3.897169,
+      "T20_n_signals": 1851,
+      "T60_win_rate": 0.6957,
+      "T60_avg_signal": 0.7529,
+      "T60_attribution": 8.793011,
+      "T60_n_signals": 1811,
+      "best_fit_regime": "Systemic_Risk",
+      "best_fit_win_rate": 0.6279
+    },
+    "marks": {
+      "node_type": "Macro",
+      "primary_horizon": 20,
+      "T5_win_rate": 0.3842,
+      "T5_avg_signal": 0.0816,
+      "T5_attribution": -2.404595,
+      "T5_n_signals": 1866,
+      "T20_win_rate": 0.3063,
+      "T20_avg_signal": 0.0816,
+      "T20_attribution": -8.976038,
+      "T20_n_signals": 1851,
+      "T60_win_rate": 0.2325,
+      "T60_avg_signal": 0.0818,
+      "T60_attribution": -25.916697,
+      "T60_n_signals": 1811,
+      "best_fit_regime": "Geopolitical_Stagflation",
+      "best_fit_win_rate": 0.7778
+    },
+    "soros": {
+      "node_type": "Growth",
+      "primary_horizon": 20,
+      "T5_win_rate": 0.3859,
+      "T5_avg_signal": 0.078,
+      "T5_attribution": -2.383794,
+      "T5_n_signals": 1866,
+      "T20_win_rate": 0.3036,
+      "T20_avg_signal": 0.078,
+      "T20_attribution": -9.224723,
+      "T20_n_signals": 1851,
+      "T60_win_rate": 0.2297,
+      "T60_avg_signal": 0.0781,
+      "T60_attribution": -26.322527,
+      "T60_n_signals": 1811,
+      "best_fit_regime": "Geopolitical_Stagflation",
+      "best_fit_win_rate": 0.7778
+    },
+    "munger": {
+      "node_type": "Value",
+      "primary_horizon": 60,
+      "T5_win_rate": 0.3923,
+      "T5_avg_signal": 0.2957,
+      "T5_attribution": -1.260879,
+      "T5_n_signals": 1866,
+      "T20_win_rate": 0.3241,
+      "T20_avg_signal": 0.2963,
+      "T20_attribution": -4.528641,
+      "T20_n_signals": 1851,
+      "T60_win_rate": 0.2562,
+      "T60_avg_signal": 0.2958,
+      "T60_attribution": -14.139128,
+      "T60_n_signals": 1811,
+      "best_fit_regime": "Deleveraging",
+      "best_fit_win_rate": 0.8009
+    },
+    "fisher": {
+      "node_type": "Growth",
+      "primary_horizon": 20,
+      "T5_win_rate": 0.4153,
+      "T5_avg_signal": 0.2517,
+      "T5_attribution": -1.857006,
+      "T5_n_signals": 1866,
+      "T20_win_rate": 0.342,
+      "T20_avg_signal": 0.253,
+      "T20_attribution": -7.856278,
+      "T20_n_signals": 1851,
+      "T60_win_rate": 0.3142,
+      "T60_avg_signal": 0.2558,
+      "T60_attribution": -19.299529,
+      "T60_n_signals": 1811,
+      "best_fit_regime": "Geopolitical_Stagflation",
+      "best_fit_win_rate": 0.7778
+    },
+    "thorp": {
+      "node_type": "Risk",
+      "primary_horizon": 60,
+      "T5_win_rate": 0.538,
+      "T5_avg_signal": 0.6059,
+      "T5_attribution": 0.140584,
+      "T5_n_signals": 1866,
+      "T20_win_rate": 0.5862,
+      "T20_avg_signal": 0.6061,
+      "T20_attribution": 0.761438,
+      "T20_n_signals": 1851,
+      "T60_win_rate": 0.5892,
+      "T60_avg_signal": 0.6048,
+      "T60_attribution": 0.49195,
+      "T60_n_signals": 1811,
+      "best_fit_regime": "Liquidity_Bubble",
+      "best_fit_win_rate": 0.7385
+    },
+    "simons": {
+      "node_type": "Quant",
+      "primary_horizon": 5,
+      "T5_win_rate": 0.3896,
+      "T5_avg_signal": 0.0893,
+      "T5_attribution": -2.119866,
+      "T5_n_signals": 1866,
+      "T20_win_rate": 0.3042,
+      "T20_avg_signal": 0.0894,
+      "T20_attribution": -9.180092,
+      "T20_n_signals": 1851,
+      "T60_win_rate": 0.2292,
+      "T60_avg_signal": 0.0897,
+      "T60_attribution": -25.37516,
+      "T60_n_signals": 1811,
+      "best_fit_regime": "Deleveraging",
+      "best_fit_win_rate": 0.5648
+    },
+    "graham": {
+      "node_type": "Value",
+      "primary_horizon": 60,
+      "T5_win_rate": 0.3859,
+      "T5_avg_signal": 0.0893,
+      "T5_attribution": -2.279889,
+      "T5_n_signals": 1866,
+      "T20_win_rate": 0.3036,
+      "T20_avg_signal": 0.0892,
+      "T20_attribution": -8.626477,
+      "T20_n_signals": 1851,
+      "T60_win_rate": 0.2297,
+      "T60_avg_signal": 0.0895,
+      "T60_attribution": -25.689703,
+      "T60_n_signals": 1811,
+      "best_fit_regime": "Deleveraging",
+      "best_fit_win_rate": 0.6574
+    },
+    "lynch": {
+      "node_type": "Growth",
+      "primary_horizon": 20,
+      "T5_win_rate": 0.3875,
+      "T5_avg_signal": 0.1242,
+      "T5_attribution": -2.155377,
+      "T5_n_signals": 1866,
+      "T20_win_rate": 0.3052,
+      "T20_avg_signal": 0.1242,
+      "T20_attribution": -8.338306,
+      "T20_n_signals": 1851,
+      "T60_win_rate": 0.2325,
+      "T60_avg_signal": 0.125,
+      "T60_attribution": -23.65855,
+      "T60_n_signals": 1811,
+      "best_fit_regime": "Geopolitical_Stagflation",
+      "best_fit_win_rate": 0.7778
+    },
+    "buffett": {
+      "node_type": "Value",
+      "primary_horizon": 60,
+      "T5_win_rate": 0.4277,
+      "T5_avg_signal": 0.3303,
+      "T5_attribution": -1.435316,
+      "T5_n_signals": 1866,
+      "T20_win_rate": 0.3987,
+      "T20_avg_signal": 0.3306,
+      "T20_attribution": -4.804754,
+      "T20_n_signals": 1851,
+      "T60_win_rate": 0.3158,
+      "T60_avg_signal": 0.3293,
+      "T60_attribution": -15.95355,
+      "T60_n_signals": 1811,
+      "best_fit_regime": "Deleveraging",
+      "best_fit_win_rate": 0.6204
+    }
+  },
+  "global_parameters": {
+    "optimization_date": "2026-03-09T17:06:48.848536",
+    "optimizer_version": "2.1_synthetic_proxy",
+    "data_range": {
+      "start": "2019-01-02",
+      "end": "2026-03-09",
+      "n_trading_days": 1871
+    },
+    "optimizer_config": {
+      "learning_rate": 0.005,
+      "inertia_lambda": 0.3,
+      "bound_pct": 0.2,
+      "max_iterations": 50,
+      "min_epochs": 20,
+      "early_stopping_patience": 3,
+      "black_swan_loss_weight": 3.0,
+      "taleb_protection_inertia_multiplier": 10.0
+    },
+    "regime_distribution": {
+      "Normal": 419,
+      "Black_Swan": 37,
+      "Liquidity_Bubble": 413,
+      "Deleveraging": 216,
+      "Systemic_Risk": 43,
+      "AI_Supercycle": 696,
+      "Geopolitical_Stagflation": 47
+    },
+    "taleb_protection_nodes": [
+      "MAC_MARKS_001",
+      "RSK_TALEB_001"
+    ],
+    "crisis_regimes": [
+      "Black_Swan",
+      "Systemic_Risk"
+    ]
+  }
+}

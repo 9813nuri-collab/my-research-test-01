@@ -1,0 +1,559 @@
+{
+  "_meta": {
+    "description": "Deductively derived expected expert responses for OFS ground truth",
+    "version": "2.0",
+    "created": "2026-03-18",
+    "derivation": "Step 1 quantitative thresholds from Master JSONs applied to wdss.json v2.0 metrics. Step 2 (NLP) = 0 (no NLP data in experiment). Step 3 statistical correction with optimized weights from DATA_WEIGHTS_optimized.json. Normalization via SigmoidNormalizer(mean=0.5, std=0.3).",
+    "ofs_threshold": 0.5,
+    "note": "expected=HIGH means normalized_score >= 0.5; expected=LOW means normalized_score < 0.5"
+  },
+
+  "expert_type": {
+    "asset_dependent": [
+      "VAL_GRAHAM_001", "VAL_BUFFETT_001", "VAL_MUNGER_001",
+      "GRO_FISHER_001", "GRO_LYNCH_001", "GRO_SOROS_001",
+      "RSK_TALEB_001", "RSK_SHANNON_001", "RSK_THORP_001"
+    ],
+    "macro_dependent": [
+      "MAC_DALIO_001", "MAC_MARKS_001", "MAC_SIMONS_001"
+    ]
+  },
+
+  "asset_expectations": {
+    "VAL_GRAHAM_001": {
+      "A1_QUALITY": {
+        "expected": "LOW",
+        "quant_hits": "1/2",
+        "threshold_detail": "Price_to_NCAV=1.05 vs <0.66 (FAIL), P/E_Ratio=12.5 vs <15 (PASS)",
+        "estimated_raw": 0.201,
+        "estimated_norm": 0.27,
+        "reason": "Only P/E passes (w=0.4). After correction (wr=0.605, df=0.829), raw~0.20 normalizes well below 0.5"
+      },
+      "A2_BALANCED": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "Price_to_NCAV=4.2 vs <0.66 (FAIL), P/E_Ratio=28.0 vs <15 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "No metrics pass. Zero quant score"
+      },
+      "A3_TOXIC": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "Price_to_NCAV=0.15 vs <0.66 (PASS), P/E_Ratio=2.8 vs <15 (PASS)",
+        "estimated_raw": 0.501,
+        "estimated_norm": 0.50,
+        "reason": "Both metrics pass (w=1.0). After correction, raw~0.50 normalizes to borderline 0.50. Graham's deep value signal fires maximally on this classic value trap"
+      },
+      "A4_HYPE": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "Price_to_NCAV=35.0 vs <0.66 (FAIL), P/E_Ratio=185.0 vs <15 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Extreme overvaluation. No metrics pass"
+      }
+    },
+
+    "VAL_BUFFETT_001": {
+      "A1_QUALITY": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "ROIC_10yr_Avg=0.22 vs >0.15 (PASS), Gross_Margin_Volatility=0.003 vs <0.05 (PASS)",
+        "estimated_raw": 0.619,
+        "estimated_norm": 0.60,
+        "reason": "Quality fortress: high ROIC + stable margins. Both metrics pass. wr=0.666, df=0.930"
+      },
+      "A2_BALANCED": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "ROIC_10yr_Avg=0.11 vs >0.15 (FAIL), Gross_Margin_Volatility=0.06 vs <0.05 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Pivot candidate: mediocre returns + volatile margins. No moat signals"
+      },
+      "A3_TOXIC": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "ROIC_10yr_Avg=0.015 vs >0.15 (FAIL), Gross_Margin_Volatility=0.15 vs <0.05 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Terrible quality: near-zero ROIC + extreme margin instability. Buffett would never invest"
+      },
+      "A4_HYPE": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "ROIC_10yr_Avg=0.025 vs >0.15 (FAIL), Gross_Margin_Volatility=0.25 vs <0.05 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Hype stock with no fundamental moat. Worst quality profile"
+      }
+    },
+
+    "VAL_MUNGER_001": {
+      "A1_QUALITY": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "Debt_to_Equity=0.02 vs <0.5 (PASS), FCF_Yield=0.065 vs >0.05 (PASS)",
+        "estimated_raw": 0.638,
+        "estimated_norm": 0.61,
+        "reason": "Conservative balance sheet + positive free cash flow. Munger's quality filter passes fully"
+      },
+      "A2_BALANCED": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "Debt_to_Equity=0.55 vs <0.5 (FAIL), FCF_Yield=0.022 vs >0.05 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Slightly over-leveraged with weak FCF from R&D spending"
+      },
+      "A3_TOXIC": {
+        "expected": "LOW",
+        "quant_hits": "1/2",
+        "threshold_detail": "Debt_to_Equity=2.25 vs <0.5 (FAIL), FCF_Yield=0.18 vs >0.05 (PASS)",
+        "estimated_raw": 0.319,
+        "estimated_norm": 0.35,
+        "reason": "High FCF_Yield (w=0.5) passes but extreme leverage fails. Munger's inversion principle: debt 2.25x is a red flag. After correction (wr=0.680, df=0.939), raw~0.32 normalizes below 0.5"
+      },
+      "A4_HYPE": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "Debt_to_Equity=1.15 vs <0.5 (FAIL), FCF_Yield=-0.15 vs >0.05 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Leveraged + negative FCF. Classic speculation target that Munger would avoid"
+      }
+    },
+
+    "GRO_FISHER_001": {
+      "A1_QUALITY": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "RnD_to_Revenue_Ratio=0.03 vs >0.08 (FAIL), Operating_Margin_Expansion_3yr=-0.01 vs >0.0 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Low R&D + declining margins. Quality fortress but not a growth story for Fisher"
+      },
+      "A2_BALANCED": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "RnD_to_Revenue_Ratio=0.12 vs >0.08 (PASS), Operating_Margin_Expansion_3yr=0.03 vs >0.0 (PASS)",
+        "estimated_raw": 0.564,
+        "estimated_norm": 0.55,
+        "reason": "Active R&D investment + expanding margins. Fisher's scuttlebutt signals: structural growth underway"
+      },
+      "A3_TOXIC": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "RnD_to_Revenue_Ratio=0.005 vs >0.08 (FAIL), Operating_Margin_Expansion_3yr=-0.08 vs >0.0 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Near-zero R&D + collapsing margins. No qualitative growth signals"
+      },
+      "A4_HYPE": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "RnD_to_Revenue_Ratio=0.35 vs >0.08 (PASS), Operating_Margin_Expansion_3yr=0.15 vs >0.0 (PASS)",
+        "estimated_raw": 0.564,
+        "estimated_norm": 0.55,
+        "reason": "Massive R&D + strong margin expansion. Fisher would see innovation pipeline potential, though price is extreme"
+      }
+    },
+
+    "GRO_LYNCH_001": {
+      "A1_QUALITY": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "PEG_Ratio=1.15 vs <1.0 (FAIL), EPS_Growth_TTM=0.042 vs >0.20 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Overpriced relative to growth. Not a fast grower or tenbagger candidate for Lynch"
+      },
+      "A2_BALANCED": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "PEG_Ratio=1.45 vs <1.0 (FAIL), EPS_Growth_TTM=0.12 vs >0.20 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Moderate growth priced in. Lynch would pass on this for faster growers"
+      },
+      "A3_TOXIC": {
+        "expected": "LOW",
+        "quant_hits": "1/2",
+        "threshold_detail": "PEG_Ratio=0.18 vs <1.0 (PASS, w=0.7), EPS_Growth_TTM=-0.22 vs >0.20 (FAIL)",
+        "estimated_raw": 0.425,
+        "estimated_norm": 0.44,
+        "reason": "Ultra-low PEG (w=0.7) passes but negative earnings growth fails. After correction (wr=0.675, df=0.899), raw~0.42 normalizes to ~0.44 — borderline LOW. Lynch would be cautious: low PEG is from depressed earnings, not genuine growth"
+      },
+      "A4_HYPE": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "PEG_Ratio=0.72 vs <1.0 (PASS), EPS_Growth_TTM=2.85 vs >0.20 (PASS)",
+        "estimated_raw": 0.607,
+        "estimated_norm": 0.59,
+        "reason": "Low PEG + explosive earnings growth. Lynch's ideal 'fast grower' profile"
+      }
+    },
+
+    "GRO_SOROS_001": {
+      "A1_QUALITY": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "Price_Momentum_1yr_Percentile=0.45 vs >0.95 (FAIL), Price_to_Fundamental_Divergence_Zscore=0.3 vs >2.5 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "No reflexivity signals. Price tracks fundamentals normally"
+      },
+      "A2_BALANCED": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "Price_Momentum_1yr_Percentile=0.60 vs >0.95 (FAIL), Price_to_Fundamental_Divergence_Zscore=1.2 vs >2.5 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Moderate momentum, no extreme reflexive feedback loop detected"
+      },
+      "A3_TOXIC": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "Price_Momentum_1yr_Percentile=0.15 vs >0.95 (FAIL), Price_to_Fundamental_Divergence_Zscore=-1.5 vs >2.5 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Negative momentum, price-fundamental divergence is actually negative (undervalued). No bubble signal"
+      },
+      "A4_HYPE": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "Price_Momentum_1yr_Percentile=0.98 vs >0.95 (PASS), Price_to_Fundamental_Divergence_Zscore=3.8 vs >2.5 (PASS)",
+        "estimated_raw": 0.537,
+        "estimated_norm": 0.53,
+        "reason": "Extreme reflexivity detected: top-percentile momentum + massive price-fundamental divergence. Classic Soros bubble audit signal"
+      }
+    },
+
+    "RSK_TALEB_001": {
+      "A1_QUALITY": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "SKEW_Index=102 vs >140 (FAIL), OTM_Put_Option_Volume_Spike=0.5 vs >3.0 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Low tail risk. SKEW well below alarm threshold, no put volume anomaly"
+      },
+      "A2_BALANCED": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "SKEW_Index=128 vs >140 (FAIL), OTM_Put_Option_Volume_Spike=1.2 vs >3.0 (FAIL)",
+        "estimated_raw": 0.0,
+        "estimated_norm": 0.16,
+        "reason": "Elevated but sub-threshold SKEW. No black swan warning"
+      },
+      "A3_TOXIC": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "SKEW_Index=165 vs >140 (PASS), OTM_Put_Option_Volume_Spike=3.5 vs >3.0 (PASS)",
+        "estimated_raw": 0.990,
+        "estimated_norm": 0.84,
+        "reason": "Extreme tail risk: SKEW=165 (well above 140) + OTM put spike at 3.5σ. Taleb's ruin probability fires strongly (wr=0.99, df=1.0)"
+      },
+      "A4_HYPE": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "SKEW_Index=178 vs >140 (PASS), OTM_Put_Option_Volume_Spike=4.2 vs >3.0 (PASS)",
+        "estimated_raw": 0.990,
+        "estimated_norm": 0.84,
+        "reason": "Maximum tail risk: SKEW=178 + OTM spike 4.2σ. Taleb would trigger Master Override / Liquidation Mode"
+      }
+    },
+
+    "RSK_SHANNON_001": {
+      "_note": "Shannon's formula is INVERTED: confidence = MAX(0.1, 1.0 - noise). HIGH score = high confidence (clear signal), LOW score = low confidence (noisy market)",
+      "A1_QUALITY": {
+        "expected": "HIGH",
+        "quant_hits": "0/2 noise metrics",
+        "threshold_detail": "Price_Trend_R_Squared=0.92 vs <0.3 (FAIL, no noise), Intraday_Volatility_vs_Daily_Return=0.8 vs >2.5 (FAIL, no noise)",
+        "estimated_raw": 1.0,
+        "estimated_norm": 0.84,
+        "reason": "Very high R² + low intraday noise. Clear, reliable signal. Shannon confidence maximal"
+      },
+      "A2_BALANCED": {
+        "expected": "HIGH",
+        "quant_hits": "0/2 noise metrics",
+        "threshold_detail": "Price_Trend_R_Squared=0.55 vs <0.3 (FAIL), Intraday_Volatility_vs_Daily_Return=1.8 vs >2.5 (FAIL)",
+        "estimated_raw": 1.0,
+        "estimated_norm": 0.84,
+        "reason": "Moderate R² but above noise threshold. No noise metrics triggered. Shannon confidence remains high"
+      },
+      "A3_TOXIC": {
+        "expected": "LOW",
+        "quant_hits": "2/2 noise metrics",
+        "threshold_detail": "Price_Trend_R_Squared=0.12 vs <0.3 (PASS, noisy), Intraday_Volatility_vs_Daily_Return=3.5 vs >2.5 (PASS, noisy)",
+        "estimated_raw": 0.308,
+        "estimated_norm": 0.35,
+        "reason": "Maximum noise: near-random price trend (R²=0.12) + extreme intraday whipsaw. Shannon confidence collapses to ~0.31"
+      },
+      "A4_HYPE": {
+        "expected": "HIGH",
+        "quant_hits": "0/2 noise metrics",
+        "threshold_detail": "Price_Trend_R_Squared=0.99 vs <0.3 (FAIL), Intraday_Volatility_vs_Daily_Return=1.2 vs >2.5 (FAIL)",
+        "estimated_raw": 1.0,
+        "estimated_norm": 0.84,
+        "reason": "Paradoxically clear trend (R²=0.99) despite hype. Price has a strong directional signal even if fundamentally detached"
+      }
+    },
+
+    "RSK_THORP_001": {
+      "_note": "Thorp's Step 3 formula chains with Shannon_Confidence_Factor. High noise reduces position sizing",
+      "A1_QUALITY": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "Expected_Value_of_Signal=0.48 vs >0.0 (PASS), Historical_Win_Rate_of_Signal=0.68 vs >0.5 (PASS)",
+        "estimated_raw": 0.690,
+        "estimated_norm": 0.66,
+        "reason": "Positive edge + decent win rate. Shannon confidence HIGH → full Kelly fraction justified"
+      },
+      "A2_BALANCED": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "Expected_Value_of_Signal=0.55 vs >0.0 (PASS), Historical_Win_Rate_of_Signal=0.52 vs >0.5 (PASS)",
+        "estimated_raw": 0.690,
+        "estimated_norm": 0.66,
+        "reason": "Positive edge + marginal win rate. Shannon confidence HIGH → reasonable bet size"
+      },
+      "A3_TOXIC": {
+        "expected": "LOW",
+        "quant_hits": "1/2",
+        "threshold_detail": "Expected_Value_of_Signal=0.28 vs >0.0 (PASS), Historical_Win_Rate_of_Signal=0.32 vs >0.5 (FAIL)",
+        "estimated_raw": 0.142,
+        "estimated_norm": 0.23,
+        "reason": "Weak edge + sub-50% win rate (w=0.5 FAIL). Shannon confidence also LOW (noise). Kelly fraction collapses: 0.5 × 0.31 × 0.83 × 0.99 ≈ 0.13"
+      },
+      "A4_HYPE": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "Expected_Value_of_Signal=0.98 vs >0.0 (PASS), Historical_Win_Rate_of_Signal=0.75 vs >0.5 (PASS)",
+        "estimated_raw": 0.690,
+        "estimated_norm": 0.66,
+        "reason": "Strong edge + high win rate. Shannon confidence HIGH. Kelly says bet big — but Taleb may override"
+      }
+    }
+  },
+
+  "macro_expectations": {
+    "MAC_DALIO_001": {
+      "_metrics": "Yield_Curve_Spread_10Y_2Y < 0.0 (w=0.4), Credit_Spread_High_Yield_Volatility > 1.5 (w=0.3), M2_Money_Supply_YoY < 0.02 (w=0.3)",
+      "M1_BOOM": {
+        "expected": "LOW",
+        "quant_hits": "0/3",
+        "threshold_detail": "Yield=1.8 (FAIL), CreditVol=0.5 (FAIL), M2=0.08 (FAIL)",
+        "estimated_norm": 0.16,
+        "reason": "Healthy yield curve + low credit stress + ample liquidity. No debt cycle stress signals"
+      },
+      "M2_STAGFLATION": {
+        "expected": "LOW",
+        "quant_hits": "2/3",
+        "threshold_detail": "Yield=0.2 (FAIL), CreditVol=1.8 (PASS), M2=0.01 (PASS)",
+        "estimated_norm": 0.41,
+        "reason": "Credit stress + tight money (quant=0.6) but positive yield curve. After correction (wr=0.704, df=0.929), raw~0.39 normalizes to ~0.41 — slightly below threshold. Borderline LOW"
+      },
+      "M3_CRISIS": {
+        "expected": "HIGH",
+        "quant_hits": "3/3",
+        "threshold_detail": "Yield=-0.5 (PASS), CreditVol=3.0 (PASS), M2=-0.02 (PASS)",
+        "estimated_norm": 0.63,
+        "reason": "All crisis indicators firing: inverted yield curve + extreme credit stress + money supply contraction. Dalio's deleveraging alarm"
+      },
+      "M4_STEADY": {
+        "expected": "LOW",
+        "quant_hits": "0/3",
+        "threshold_detail": "Yield=1.2 (FAIL), CreditVol=0.8 (FAIL), M2=0.05 (FAIL)",
+        "estimated_norm": 0.16,
+        "reason": "Goldilocks conditions. No macro stress signals"
+      },
+      "M5_MANIA": {
+        "expected": "LOW",
+        "quant_hits": "0/3",
+        "threshold_detail": "Yield=0.8 (FAIL), CreditVol=1.0 (FAIL), M2=0.07 (FAIL)",
+        "estimated_norm": 0.16,
+        "reason": "Despite mania narrative, macro conditions are structurally sound. Dalio sees no debt cycle alarm"
+      },
+      "M6_DEFLATION": {
+        "expected": "HIGH",
+        "quant_hits": "3/3",
+        "threshold_detail": "Yield=-0.3 (PASS), CreditVol=2.2 (PASS), M2=-0.01 (PASS)",
+        "estimated_norm": 0.63,
+        "reason": "Deflationary deleveraging: inverted curve + credit stress + money contraction. Full Dalio risk signal"
+      }
+    },
+
+    "MAC_MARKS_001": {
+      "_metrics": "VIX_Index > 35 (w=0.5), OAS_Spread_Zscore > 2.0 (w=0.5). Formula: MAX(0, quant+qual) * wr * df",
+      "M1_BOOM": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "VIX=12 (FAIL), OAS=0.3 (FAIL)",
+        "estimated_norm": 0.16,
+        "reason": "Extreme complacency. VIX=12 is euphoria territory. Marks' pendulum at the top (overconfidence). Quant: 0, but qualitative -0.5 penalty for FOMO/Goldilocks"
+      },
+      "M2_STAGFLATION": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "VIX=28 (FAIL), OAS=1.5 (FAIL)",
+        "estimated_norm": 0.16,
+        "reason": "Elevated fear but not capitulation. VIX sub-35, OAS sub-2.0. Marks waits for deeper panic"
+      },
+      "M3_CRISIS": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "VIX=45 (PASS), OAS=3.2 (PASS)",
+        "estimated_norm": 0.58,
+        "reason": "Capitulation territory: VIX=45 + OAS_Z=3.2. Marks' contrarian aggression signal: 'when the pendulum reaches the bottom, buy aggressively'"
+      },
+      "M4_STEADY": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "VIX=15 (FAIL), OAS=0.5 (FAIL)",
+        "estimated_norm": 0.16,
+        "reason": "Calm markets. No capitulation signal"
+      },
+      "M5_MANIA": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "VIX=18 (FAIL), OAS=0.8 (FAIL)",
+        "estimated_norm": 0.16,
+        "reason": "Low VIX during mania = complacency. Marks would be cautious (contrarian at tops), but quant metrics don't trigger"
+      },
+      "M6_DEFLATION": {
+        "expected": "LOW",
+        "quant_hits": "1/2",
+        "threshold_detail": "VIX=35 (FAIL, operator is >35 not >=35), OAS=2.5 (PASS)",
+        "estimated_norm": 0.34,
+        "reason": "OAS passes (w=0.5) but VIX=35 barely misses >35 threshold. After correction (wr=0.664, df=0.908), raw~0.30 normalizes to ~0.34. Below 0.5 threshold"
+      }
+    },
+
+    "MAC_SIMONS_001": {
+      "_metrics": "Price_Mean_Reversion_Zscore < -3.0 (w=0.6), Order_Book_Imbalance_Ratio > 0.8 (w=0.4). Step 3 refs: Marks_Capitulation_Score",
+      "M1_BOOM": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "MeanRev_Z=0.5 (FAIL), OBI=0.52 (FAIL)",
+        "estimated_norm": 0.16,
+        "reason": "No statistical anomaly. Prices near mean, order book balanced"
+      },
+      "M2_STAGFLATION": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "MeanRev_Z=-0.8 (FAIL), OBI=0.48 (FAIL)",
+        "estimated_norm": 0.16,
+        "reason": "Mild deviation from mean but not extreme enough for stat-arb. No anomaly signal"
+      },
+      "M3_CRISIS": {
+        "expected": "HIGH",
+        "quant_hits": "2/2",
+        "threshold_detail": "MeanRev_Z=-3.5 (PASS), OBI=0.85 (PASS)",
+        "estimated_norm": 0.75,
+        "reason": "Extreme mean reversion opportunity (Z=-3.5) + order book imbalance. Step 3 synergy with Marks (~0.58) amplifies: raw = 1.0 * 0.540 * 0.971 * (1+0.58) ≈ 0.83. Strong stat-arb signal"
+      },
+      "M4_STEADY": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "MeanRev_Z=0.2 (FAIL), OBI=0.51 (FAIL)",
+        "estimated_norm": 0.16,
+        "reason": "Normal conditions. No price anomaly to exploit"
+      },
+      "M5_MANIA": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "MeanRev_Z=1.5 (FAIL, positive Z means above mean), OBI=0.55 (FAIL)",
+        "estimated_norm": 0.16,
+        "reason": "Price above mean (positive Z) but Simons looks for extreme negative deviation (< -3.0). No stat-arb entry"
+      },
+      "M6_DEFLATION": {
+        "expected": "LOW",
+        "quant_hits": "0/2",
+        "threshold_detail": "MeanRev_Z=-2.8 (FAIL, above -3.0), OBI=0.78 (FAIL, below 0.8)",
+        "estimated_norm": 0.16,
+        "reason": "Close to thresholds but neither passes. MeanRev -2.8 > -3.0 threshold, OBI 0.78 < 0.8. Simons remains disciplined"
+      }
+    }
+  },
+
+  "edge_expectations": {
+    "EDGE_VAL_001_Munger_to_Graham": {
+      "type": "Continuous_Discount",
+      "condition_regime": ["Normal_Market", "Bull_Market"],
+      "expectation": "When Munger score is LOW (e.g., A2/A4), Graham score is discounted further in Normal/Bull regimes",
+      "key_scenario": "A3_TOXIC in Normal_Market: Munger=LOW → Graham's HIGH score gets discounted"
+    },
+    "EDGE_VAL_002_Graham_to_Buffett": {
+      "type": "Continuous_Synergy",
+      "condition_regime": ["Market_Crash", "Liquidity_Crisis"],
+      "expectation": "In crisis, Graham HIGH + Buffett → Buffett gets boosted",
+      "key_scenario": "M3_CRISIS + A3_TOXIC: Graham=HIGH → Buffett synergy boost"
+    },
+    "EDGE_RSK_001_Taleb_to_ALL": {
+      "type": "Continuous_Master_Discount",
+      "condition_regime": ["Tail_Risk_Event", "Systemic_Crash"],
+      "expectation": "Taleb HIGH → exponential decay on ALL other scores: Target * exp(-Taleb*3)",
+      "key_scenario": "A3_TOXIC/A4_HYPE with Taleb HIGH: all scores suppressed dramatically"
+    },
+    "EDGE_RSK_002_Shannon_to_Thorp": {
+      "type": "Continuous_Discount",
+      "condition_regime": ["High_Noise_Market", "Sideways"],
+      "expectation": "Shannon LOW confidence → Thorp position sizing reduced",
+      "key_scenario": "A3_TOXIC: Shannon LOW → Thorp bet collapses"
+    },
+    "EDGE_MAC_001_Dalio_to_Growth_Value": {
+      "type": "Continuous_Macro_Adjust",
+      "condition_regime": ["Tightening", "Deleveraging"],
+      "expectation": "Dalio HIGH → Growth scores reduced, Value scores increased",
+      "key_scenario": "M3_CRISIS/M6_DEFLATION: Dalio HIGH → systematic tilt from Growth to Value"
+    },
+    "EDGE_MAC_002_Marks_to_Simons": {
+      "type": "Continuous_Synergy",
+      "condition_regime": ["Panic_Selling", "Capitulation"],
+      "expectation": "Marks HIGH → Simons stat-arb opportunity amplified",
+      "key_scenario": "M3_CRISIS: Marks HIGH → Simons score multiplicatively boosted"
+    },
+    "EDGE_GRO_001_Fisher_to_Lynch": {
+      "type": "Continuous_Synergy",
+      "condition_regime": ["Normal_Market", "Innovation_Cycle"],
+      "expectation": "Fisher HIGH → Lynch score boosted (quality growth reinforces momentum)",
+      "key_scenario": "A4_HYPE in Normal_Market: Fisher HIGH → Lynch boost"
+    },
+    "EDGE_GRO_002_Soros_to_Lynch": {
+      "type": "Continuous_Discount",
+      "condition_regime": ["Late_Bull_Market", "Liquidity_Excess"],
+      "expectation": "Soros HIGH (bubble detected) → Lynch score discounted",
+      "key_scenario": "M5_MANIA + A4_HYPE: Soros HIGH → Lynch's fast grower enthusiasm dampened"
+    }
+  },
+
+  "ablation_predictions": {
+    "no_graham": {
+      "description": "Remove VAL_GRAHAM_001 node entirely",
+      "predicted_effect": "A3_TOXIC scenarios: Value domain average score drops (deep value signal lost). Other assets: minimal change (Graham was already LOW)",
+      "key_metric": "VAL domain mean score on A3_TOXIC decreases"
+    },
+    "no_taleb": {
+      "description": "Remove RSK_TALEB_001 node and its Master Override edge",
+      "predicted_effect": "A3_TOXIC/A4_HYPE scenarios: ensemble score INCREASES (brake removed). Risk sensitivity drops across the board",
+      "key_metric": "Ensemble score on high-SKEW assets increases"
+    },
+    "no_risk": {
+      "description": "Remove all RSK_* nodes (Taleb, Shannon, Thorp)",
+      "predicted_effect": "All scenarios: loss of position sizing, noise filtering, and tail risk protection. Score variance increases (no dampening)",
+      "key_metric": "Score variance across scenarios increases"
+    },
+    "no_edges": {
+      "description": "Remove all Logical Edges (set _variant_no_edges=True)",
+      "predicted_effect": "Munger→Graham discount removed: A3_TOXIC Graham score rises. Graham→Buffett synergy removed: M3_CRISIS Value synergy lost. Taleb→ALL override removed: high-risk assets get higher ensemble scores",
+      "key_metric": "CDI may decrease (less inter-expert interaction differentiation)"
+    },
+    "flat_ensemble": {
+      "description": "Replace confidence-weighted ensemble with simple average (_variant_flat_ensemble=True)",
+      "predicted_effect": "Extreme scenarios (A3, A4): ensemble moves toward center (high-conviction experts lose influence). Less extreme final scores",
+      "key_metric": "Ensemble scores on A3/A4 move toward 0.5 (central tendency)"
+    }
+  }
+}

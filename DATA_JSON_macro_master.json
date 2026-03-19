@@ -1,0 +1,168 @@
+{
+    "Ontology_Schema": "H-PIOS_v8.5_GraphRAG_Master",
+    "Engine_Domain": "Macro_Investment",
+    "Last_Update": "2026-03-09",
+    "Nodes": [
+      {
+        "Node_ID": "MAC_DALIO_001",
+        "Master": "Ray Dalio",
+        "Core_Concept": "Short_and_Long_Term_Debt_Cycles",
+        "Full_Description": "중앙은행의 금리 정책과 신용 팽창/수축에 따른 매크로 국면(Regime) 판별 및 전역 비중 조절",
+        "Intelligence_Structure": {
+          "Step_1_Quantitative_Analysis": {
+            "metrics": [
+              { "metric": "Yield_Curve_Spread_10Y_2Y", "operator": "Trend", "threshold": 0.0, "weight": 0.4, "logic_formula": "IF Yield_Curve_Spread_10Y_2Y < 0.0 THEN +0.4 ELSE 0" },
+              { "metric": "Credit_Spread_High_Yield_Volatility", "operator": "Volatility", "threshold": 1.5, "weight": 0.3, "logic_formula": "IF Credit_Spread_High_Yield_Volatility > 1.5 THEN +0.3 ELSE 0" },
+              { "metric": "M2_Money_Supply_YoY", "operator": "<", "threshold": 0.02, "weight": 0.3, "logic_formula": "IF M2_Money_Supply_YoY < 0.02 THEN +0.3 ELSE 0" }
+            ],
+            "output_variable": "L_quant_dalio"
+          },
+          "Step_2_Qualitative_Context": {
+            "nlp_confidence_threshold": 0.85,
+            "scenarios": [
+              {
+                "condition": "Fed text contains 'Higher for longer' OR 'Hawkish' AND 'Deleveraging' context",
+                "score_modifier": 0.6,
+                "context": "구조적 신용 수축(Tightening) 및 금리 고점 국면 확정",
+                "keywords": ["디레버리징", "양적 긴축", "연준 매파적", "긴축 유지"]
+              },
+              {
+                "condition": "News mentions 'Bank Run' OR 'Systemic Risk Warning' spikes",
+                "score_modifier": 0.4,
+                "context": "단기 부채 주기 상의 파국적 유동성 증발 및 시스템 붕괴 징후",
+                "keywords": ["뱅크런", "시스템 리스크", "유동성 위기", "금융 위기"]
+              }
+            ],
+            "output_variable": "L_qual_dalio"
+          },
+          "Step_3_Statistical_Correction": {
+            "formula": "(L_quant_dalio + L_qual_dalio) * historical_win_rate * decay_factor",
+            "constants": {
+              "historical_win_rate": 0.72,
+              "decay_factor": 0.95,
+              "regime_performance": { "Deleveraging": 0.88, "Reflation": 0.80 }
+            }
+          }
+        },
+        "Final_Output": {
+          "Score_Variable": "Dalio_Regime_Risk_Score",
+          "Signal_Type": "Global_Weight_Adjuster",
+          "State_Flags": ["Deleveraging", "Reflation", "Credit_Crunch"],
+          "Range": "0.0 ~ 1.368"
+        }
+      },
+      {
+        "Node_ID": "MAC_MARKS_001",
+        "Master": "Howard Marks",
+        "Core_Concept": "Market_Pendulum_and_Credit_Cycle",
+        "Full_Description": "투자자 심리의 진자 운동과 신용 시장의 극단적 경색/이완 상태(Risk Premium) 측정 및 역발상 기회 포착",
+        "Intelligence_Structure": {
+          "Step_1_Quantitative_Analysis": {
+            "metrics": [
+              { "metric": "VIX_Index", "operator": ">", "threshold": 35, "weight": 0.5, "logic_formula": "IF VIX_Index > 35 THEN +0.5 ELSE 0" },
+              { "metric": "OAS_Spread_Zscore", "operator": ">", "threshold": 2.0, "weight": 0.5, "logic_formula": "IF OAS_Spread_Zscore > 2.0 THEN +0.5 ELSE 0" }
+            ],
+            "output_variable": "L_quant_marks"
+          },
+          "Step_2_Qualitative_Context": {
+            "nlp_confidence_threshold": 0.90,
+            "scenarios": [
+              {
+                "condition": "Extreme prevalence of 'Panic Selling', 'Capitulation', OR 'Cash is King'",
+                "score_modifier": 0.7,
+                "context": "진자의 극단적 하락점 (리스크 수용 및 적극 매수 시기)",
+                "keywords": ["항복(Capitulation)", "공포 확산", "묻지마 매도", "패닉", "바닥론"]
+              },
+              {
+                "condition": "'Goldilocks' OR 'FOMO' mentioned AND VIX Index < 15",
+                "score_modifier": -0.5,
+                "context": "진자의 극단적 상승점 (리스크 회피 및 현금 비중 확대 시기)",
+                "keywords": ["골디락스", "FOMO", "낙관론", "소외 불안"]
+              }
+            ],
+            "output_variable": "L_qual_marks"
+          },
+          "Step_3_Statistical_Correction": {
+            "formula": "MAX(0, L_quant_marks + L_qual_marks) * historical_win_rate * decay_factor",
+            "constants": {
+              "historical_win_rate": 0.68,
+              "decay_factor": 0.93,
+              "regime_performance": { "Market_Bottom": 0.92, "Market_Top": 0.85 }
+            }
+          }
+        },
+        "Final_Output": {
+          "Score_Variable": "Marks_Capitulation_Score",
+          "Signal_Type": "Enable_Contrarian_Aggression",
+          "State_Flags": ["Market_Bottom_Panic", "Neutral", "Market_Top_Euphoria"],
+          "Range": "0.0 ~ 1.075"
+        }
+      },
+      {
+        "Node_ID": "MAC_SIMONS_001",
+        "Master": "Jim Simons",
+        "Core_Concept": "Quantitative_Pattern_Recognition",
+        "Full_Description": "시장 미시구조 내의 단기적 가격 이상(Anomaly) 현상 및 통계적 차익거래 기회 포착",
+        "Intelligence_Structure": {
+          "Step_1_Quantitative_Analysis": {
+            "metrics": [
+              { "metric": "Price_Mean_Reversion_Zscore", "operator": "<", "threshold": -3.0, "weight": 0.6, "logic_formula": "IF Price_Mean_Reversion_Zscore < -3.0 THEN +0.6 ELSE 0" },
+              { "metric": "Order_Book_Imbalance_Ratio", "operator": ">", "threshold": 0.8, "weight": 0.4, "logic_formula": "IF Order_Book_Imbalance_Ratio > 0.8 THEN +0.4 ELSE 0" }
+            ],
+            "output_variable": "L_quant_simons"
+          },
+          "Step_2_Qualitative_Context": {
+            "nlp_confidence_threshold": 0.70,
+            "scenarios": [
+              {
+                "condition": "Price crash with 'Flash Crash' OR 'Algo Malfunction' keywords",
+                "score_modifier": 0.8,
+                "context": "일시적 기계적 수급 공백으로 인한 차익거래 기회",
+                "keywords": ["플래시 크래시", "알고리즘 오작동", "일시적 수급 붕괴"]
+              },
+              {
+                "condition": "Price crash due to 'Earnings Shock' OR 'Accounting Fraud'",
+                "score_modifier": -1.0,
+                "action": "CRITICAL_INHIBIT",
+                "context": "정당한 펀더멘털 재평가 (역추세 매매 금지)",
+                "keywords": ["어닝 쇼크", "분식회계", "본질적 가치 훼손"]
+              }
+            ],
+            "output_variable": "L_qual_simons"
+          },
+          "Step_3_Statistical_Correction": {
+            "formula": "(L_quant_simons + L_qual_simons) * historical_win_rate * decay_factor * (1 + Marks_Capitulation_Score)",
+            "constants": {
+              "historical_win_rate": 0.55,
+              "decay_factor": 0.99,
+              "regime_performance": { "High_Volatility": 0.75, "Sideways_Market": 0.65 }
+            }
+          }
+        },
+        "Final_Output": {
+          "Score_Variable": "Simons_Anomaly_Score",
+          "Signal_Type": "Execute_StatArb_Trade",
+          "State_Flags": ["Flash_Crash_Opportunity", "Structural_Decline_Avoid"],
+          "Range": "0.0 ~ 1.8+ (Synergized)"
+        }
+      }
+    ],
+    "Logical_Edges": [
+      {
+        "Edge_ID": "EDGE_MAC_001",
+        "Source": "MAC_DALIO_001",
+        "Target": "ALL_GROWTH_AND_VALUE_NODES",
+        "Relationship_Type": "Continuous_Macro_Adjust",
+        "Condition_Regime": ["Tightening", "Deleveraging"],
+        "Logic": "Growth_Score = Growth_Score * (1.0 - 0.5 * Source_Score), Value_Score = Value_Score * (1.0 + 0.5 * Source_Score) -- Smooth shift from Growth to Value based on Dalio Risk"
+      },
+      {
+        "Edge_ID": "EDGE_MAC_002",
+        "Source": "MAC_MARKS_001",
+        "Target": "MAC_SIMONS_001",
+        "Relationship_Type": "Continuous_Synergy",
+        "Condition_Regime": ["Panic_Selling", "Capitulation"],
+        "Logic": "Target_Score = Target_Score * (1.0 + Target_Score * Source_Score) -- Continuous multiplier from Marks"
+      }
+    ]
+  }

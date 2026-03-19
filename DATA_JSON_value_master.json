@@ -1,0 +1,175 @@
+{
+    "Ontology_Schema": "H-PIOS_v8.5_GraphRAG_Master",
+    "Engine_Domain": "Value_Investment",
+    "Last_Update": "2026-03-09",
+    "Nodes": [
+      {
+        "Node_ID": "VAL_GRAHAM_001",
+        "Master": "Benjamin Graham",
+        "Core_Concept": "Margin_of_Safety",
+        "Full_Description": "내재가치 대비 시장가격의 극단적 할인 상태 탐지 및 청산 가치 기반 안전마진 확보",
+        "Intelligence_Structure": {
+          "Step_1_Quantitative_Analysis": {
+            "metrics": [
+              { "metric": "Price_to_NCAV", "operator": "<", "threshold": 0.66, "weight": 0.6, "logic_formula": "IF Price_to_NCAV < 0.66 THEN +0.6 ELSE 0" },
+              { "metric": "P/E_Ratio", "operator": "<", "threshold": 15, "weight": 0.4, "logic_formula": "IF P/E_Ratio < 15 THEN +0.4 ELSE 0" }
+            ],
+            "output_variable": "L_quant_graham"
+          },
+          "Step_2_Qualitative_Context": {
+            "nlp_confidence_threshold": 0.75,
+            "scenarios": [
+              {
+                "condition": "Asset Sale news detected AND No Default keywords",
+                "score_modifier": 0.5,
+                "context": "청산 가치의 실질적 현실화 가능성 탐지",
+                "keywords": ["청산 가치", "자산 매각", "부동산 처분"]
+              },
+              {
+                "condition": "Extreme Panic OR Indiscriminate Selling keywords in reports",
+                "score_modifier": 0.5,
+                "context": "비이성적 시장 투매로 인한 가격 왜곡 확인",
+                "keywords": ["과도한 패닉", "무차별 매도", "소외주", "투매"]
+              }
+            ],
+            "output_variable": "L_qual_graham"
+          },
+          "Step_3_Statistical_Correction": {
+            "formula": "(L_quant_graham + L_qual_graham) * historical_win_rate * decay_factor",
+            "constants": {
+              "historical_win_rate": 0.62,
+              "decay_factor": 0.85,
+              "regime_performance": { "Bear_Market": 0.75, "Bull_Market": 0.45 }
+            }
+          }
+        },
+        "Final_Output": {
+          "Score_Variable": "Graham_DeepValue_Score",
+          "Signal_Type": "Accumulate_Deep_Value",
+          "State_Flags": ["Deep_Discount", "Fair_Value", "Value_Trap_Warning"],
+          "Range": "0.0 ~ 1.054"
+        }
+      },
+      {
+        "Node_ID": "VAL_BUFFETT_001",
+        "Master": "Warren Buffett",
+        "Core_Concept": "Economic_Moat",
+        "Full_Description": "장기적 가격 결정력과 자본 배치 효율성을 갖춘 영구적 해자 및 비즈니스 모델 지속성 검증",
+        "Intelligence_Structure": {
+          "Step_1_Quantitative_Analysis": {
+            "metrics": [
+              { "metric": "ROIC_10yr_Avg", "operator": ">", "threshold": 0.15, "weight": 0.5, "logic_formula": "IF ROIC_10yr_Avg > 0.15 THEN +0.5 ELSE 0" },
+              { "metric": "Gross_Margin_Volatility", "operator": "<", "threshold": 0.05, "weight": 0.5, "logic_formula": "IF Gross_Margin_Volatility < 0.05 THEN +0.5 ELSE 0" }
+            ],
+            "output_variable": "L_quant_buffett"
+          },
+          "Step_2_Qualitative_Context": {
+            "nlp_confidence_threshold": 0.85,
+            "scenarios": [
+              {
+                "condition": "Price Hike announcement AND No Volume Drop in subsequent reports",
+                "score_modifier": 0.6,
+                "context": "강력한 가격 결정력(Pricing Power) 증명",
+                "keywords": ["가격 인상", "판매가 조정", "단가 상승", "브랜드 파워"]
+              },
+              {
+                "condition": "Gov License OR Patent Extension news detected",
+                "score_modifier": 0.4,
+                "context": "진입 장벽 및 규제적 해자 강화 확인",
+                "keywords": ["전환 비용", "네트워크 효과", "정부 독점 허가", "특허"]
+              }
+            ],
+            "output_variable": "L_qual_buffett"
+          },
+          "Step_3_Statistical_Correction": {
+            "formula": "(L_quant_buffett + L_qual_buffett) * historical_win_rate * decay_factor",
+            "constants": {
+              "historical_win_rate": 0.68,
+              "decay_factor": 0.95,
+              "regime_performance": { "Low_Inflation": 0.70, "High_Inflation": 0.65 }
+            }
+          }
+        },
+        "Final_Output": {
+          "Score_Variable": "Buffett_Moat_Score",
+          "Signal_Type": "Buy_and_Hold_Quality",
+          "State_Flags": ["Wide_Moat", "Narrow_Moat", "No_Moat"],
+          "Range": "0.0 ~ 1.292"
+        }
+      },
+      {
+        "Node_ID": "VAL_MUNGER_001",
+        "Master": "Charlie Munger",
+        "Core_Concept": "Inversion_and_Quality",
+        "Full_Description": "다학제적 격자모델을 통한 오판 방지 및 훌륭한 기업의 적정가 매수 논리 검증",
+        "Intelligence_Structure": {
+          "Step_1_Quantitative_Analysis": {
+            "metrics": [
+              { "metric": "Debt_to_Equity", "operator": "<", "threshold": 0.5, "weight": 0.5, "logic_formula": "IF Debt_to_Equity < 0.5 THEN +0.5 ELSE 0" },
+              { "metric": "FCF_Yield", "operator": ">", "threshold": 0.05, "weight": 0.5, "logic_formula": "IF FCF_Yield > 0.05 THEN +0.5 ELSE 0" }
+            ],
+            "output_variable": "L_quant_munger"
+          },
+          "Step_2_Qualitative_Context": {
+            "nlp_confidence_threshold": 0.90,
+            "scenarios": [
+              {
+                "condition": "Detection of accounting changes, embezzlement, or frequent CFO turnover",
+                "score_modifier": -1.0,
+                "action": "CRITICAL_INHIBIT",
+                "context": "경영진 부정 및 회계 리스크 (Inversion: 실패 요인 제거)",
+                "keywords": ["경영진 무능", "회계 조작 의혹", "CFO 교체", "횡령", "부도덕"]
+              },
+              {
+                "condition": "Simultaneous mention of Tech superiority AND Network Effect",
+                "score_modifier": 0.5,
+                "context": "Lollapalooza Effect: 여러 장점이 결합된 강력한 시너지",
+                "keywords": ["룰라팔루자 효과", "군집 행동", "시너지", "기술 우위"]
+              }
+            ],
+            "output_variable": "L_qual_munger"
+          },
+          "Step_3_Statistical_Correction": {
+            "formula": "MAX(0, (L_quant_munger + L_qual_munger)) * historical_win_rate * decay_factor",
+            "constants": {
+              "historical_win_rate": 0.71,
+              "decay_factor": 0.98,
+              "regime_performance": { "All_Weather": 0.71 }
+            }
+          }
+        },
+        "Final_Output": {
+          "Score_Variable": "Munger_Quality_Score",
+          "Signal_Type": "Approve_Quality / Inhibit_Fraud",
+          "State_Flags": ["Premium_Quality", "Red_Flag_Warning"],
+          "Range": "0.0 ~ 1.043"
+        }
+      }
+    ],
+    "Logical_Edges": [
+      {
+        "Edge_ID": "EDGE_VAL_001",
+        "Source": "VAL_MUNGER_001",
+        "Target": "VAL_GRAHAM_001",
+        "Relationship_Type": "Continuous_Discount",
+        "Condition_Regime": ["Normal_Market", "Bull_Market"],
+        "Logic": "Graham_Score = Graham_Score * (Munger_Quality_Score + 0.1) -- Low quality scales down Graham"
+      },
+      {
+        "Edge_ID": "EDGE_VAL_002",
+        "Source": "VAL_GRAHAM_001",
+        "Target": "VAL_BUFFETT_001",
+        "Relationship_Type": "Continuous_Synergy",
+        "Condition_Regime": ["Market_Crash", "Liquidity_Crisis"],
+        "Logic": "Target_Score = Target_Score * (1.0 + 0.5 * Source_Score) -- Continuous boost based on source strength"
+      },
+      {
+        "Edge_ID": "EDGE_VAL_003",
+        "Source": "VAL_MUNGER_001",
+        "Target": "VAL_BUFFETT_001",
+        "Relationship_Type": "Continuous_Discount",
+        "Condition_Regime": ["High_Fraud_Risk_Sector"],
+        "Logic": "Buffett_Score = Buffett_Score * (Munger_Quality_Score + 0.1) -- Fraud risk continuously scales down Buffett"
+      }
+    ]
+  }

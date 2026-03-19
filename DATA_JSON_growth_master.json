@@ -1,0 +1,166 @@
+{
+    "Ontology_Schema": "H-PIOS_v8.5_GraphRAG_Master",
+    "Engine_Domain": "Growth_Investment",
+    "Last_Update": "2026-03-09",
+    "Nodes": [
+      {
+        "Node_ID": "GRO_FISHER_001",
+        "Master": "Philip Fisher",
+        "Core_Concept": "Qualitative_Growth_and_Scuttlebutt",
+        "Full_Description": "탁월한 경영진, 강력한 R&D, 영업망을 바탕으로 한 구조적 질적 성장 및 스커틀벗(현장 조사) 기반 데이터 탐지",
+        "Intelligence_Structure": {
+          "Step_1_Quantitative_Analysis": {
+            "metrics": [
+              { "metric": "RnD_to_Revenue_Ratio", "operator": ">", "threshold": 0.08, "weight": 0.6, "logic_formula": "IF RnD_to_Revenue_Ratio > 0.08 THEN +0.6 ELSE 0" },
+              { "metric": "Operating_Margin_Expansion_3yr", "operator": ">", "threshold": 0.0, "weight": 0.4, "logic_formula": "IF Operating_Margin_Expansion_3yr > 0.0 THEN +0.4 ELSE 0" }
+            ],
+            "output_variable": "L_quant_fisher"
+          },
+          "Step_2_Qualitative_Context": {
+            "nlp_confidence_threshold": 0.80,
+            "scenarios": [
+              {
+                "condition": "Mention of 'New Pipeline' AND ('Unique Tech' OR 'Competitor Entry Delay') context",
+                "score_modifier": 0.6,
+                "context": "미래 핵심 수익원(Cash Cow) 확보 확률 및 기술적 해자 확인",
+                "keywords": ["신제품 파이프라인", "독보적 기술력", "경쟁사 진입 지연", "R&D 성과"]
+              },
+              {
+                "condition": "'Insider Buy' disclosure AND positive assessment of 'Crisis Management'",
+                "score_modifier": 0.4,
+                "context": "경영진의 펀더멘털 자신감 및 내부 정보 우위 확인",
+                "keywords": ["내부자 매수", "위기 관리 능력", "경영진 역량", "지분 확대"]
+              }
+            ],
+            "output_variable": "L_qual_fisher"
+          },
+          "Step_3_Statistical_Correction": {
+            "formula": "(L_quant_fisher + L_qual_fisher) * historical_win_rate * decay_factor",
+            "constants": {
+              "historical_win_rate": 0.65,
+              "decay_factor": 0.90,
+              "regime_performance": { "Innovation_Cycle": 0.80, "Stagflation": 0.40 }
+            }
+          }
+        },
+        "Final_Output": {
+          "Score_Variable": "Fisher_Qualitative_Growth_Score",
+          "Signal_Type": "Accumulate_Structural_Growth",
+          "State_Flags": ["Elite_Enterprise", "Maturing_Growth", "Innovation_Stagnation"],
+          "Range": "0.0 ~ 1.170"
+        }
+      },
+      {
+        "Node_ID": "GRO_LYNCH_001",
+        "Master": "Peter Lynch",
+        "Core_Concept": "PEG_and_Earnings_Momentum",
+        "Full_Description": "이익 성장률 대비 저평가된 고성장 기업(Fast Growers) 및 월가의 소외를 뚫고 나오는 턴어라운드 모멘텀 탐지",
+        "Intelligence_Structure": {
+          "Step_1_Quantitative_Analysis": {
+            "metrics": [
+              { "metric": "PEG_Ratio", "operator": "<", "threshold": 1.0, "weight": 0.7, "logic_formula": "IF PEG_Ratio < 1.0 THEN +0.7 ELSE 0" },
+              { "metric": "EPS_Growth_TTM", "operator": ">", "threshold": 0.20, "weight": 0.3, "logic_formula": "IF EPS_Growth_TTM > 0.20 THEN +0.3 ELSE 0" }
+            ],
+            "output_variable": "L_quant_lynch"
+          },
+          "Step_2_Qualitative_Context": {
+            "nlp_confidence_threshold": 0.75,
+            "scenarios": [
+              {
+                "condition": "Consumer data shows 'Mega Hit Product' signs AND 'Market Share Expansion' in reports",
+                "score_modifier": 0.6,
+                "context": "실생활 밀착형 폭발적 성장(Fast Grower) 진입 신호",
+                "keywords": ["메가 히트 상품", "시장 점유율 확대", "소비자 열광", "신규 매장 확대"]
+              },
+              {
+                "condition": "Earnings Surprise AND ('Low Institutional Ownership' OR 'Low Analyst Coverage')",
+                "score_modifier": 0.4,
+                "context": "월가가 아직 발견하지 못한 숨겨진 텐배거(Tenbagger) 후보 탐지",
+                "keywords": ["기관 투자자 소외", "턴어라운드", "애널리스트 무관심", "실적 서프라이즈"]
+              }
+            ],
+            "output_variable": "L_qual_lynch"
+          },
+          "Step_3_Statistical_Correction": {
+            "formula": "(L_quant_lynch + L_qual_lynch) * historical_win_rate * decay_factor",
+            "constants": {
+              "historical_win_rate": 0.69,
+              "decay_factor": 0.92,
+              "regime_performance": { "Early_Bull_Market": 0.85, "Recession": 0.35 }
+            }
+          }
+        },
+        "Final_Output": {
+          "Score_Variable": "Lynch_PEG_Momentum_Score",
+          "Signal_Type": "Buy_Fast_Grower",
+          "State_Flags": ["Hidden_Gem", "Priced_In", "Value_Trap_Turnaround"],
+          "Range": "0.0 ~ 1.269"
+        }
+      },
+      {
+        "Node_ID": "GRO_SOROS_001",
+        "Master": "George Soros",
+        "Core_Concept": "Theory_of_Reflexivity",
+        "Full_Description": "참여자의 편견이 펀더멘털을 왜곡하여 만드는 자기 강화적 피드백 루프(거품 형성 및 붕괴) 탐지 및 리스크 감사",
+        "Intelligence_Structure": {
+          "Step_1_Quantitative_Analysis": {
+            "metrics": [
+              { "metric": "Price_Momentum_1yr_Percentile", "operator": ">", "threshold": 0.95, "weight": 0.5, "logic_formula": "IF Price_Momentum_1yr_Percentile > 0.95 THEN +0.5 ELSE 0" },
+              { "metric": "Price_to_Fundamental_Divergence_Zscore", "operator": ">", "threshold": 2.5, "weight": 0.5, "logic_formula": "IF Price_to_Fundamental_Divergence_Zscore > 2.5 THEN +0.5 ELSE 0" }
+            ],
+            "output_variable": "L_quant_soros"
+          },
+          "Step_2_Qualitative_Context": {
+            "nlp_confidence_threshold": 0.85,
+            "scenarios": [
+              {
+                "condition": "Extreme prevalence of 'New Paradigm' OR 'This time is different' optimism",
+                "score_modifier": 0.7,
+                "context": "재귀성 팽창의 극단(Bubble Peak) 및 이성적 판단 상실 확인",
+                "keywords": ["새로운 패러다임", "이번엔 다르다", "무조건적 낙관론", "영구적 상승"]
+              },
+              {
+                "condition": "Stock rise driven by 'Liquidity Inflow' or 'Retail FOMO' rather than Value creation",
+                "score_modifier": 0.3,
+                "context": "펀더멘털과 무관한 유동성 주도 광기 장세 확증",
+                "keywords": ["초과 유동성 유입", "소매 투자자 포모", "개미 광기", "FOMO"]
+              }
+            ],
+            "output_variable": "L_qual_soros"
+          },
+          "Step_3_Statistical_Correction": {
+            "formula": "(L_quant_soros + L_qual_soros) * historical_win_rate * decay_factor",
+            "constants": {
+              "historical_win_rate": 0.58,
+              "decay_factor": 0.96,
+              "regime_performance": { "Late_Bull_Market": 0.90, "Bubble_Burst": 0.95 }
+            }
+          }
+        },
+        "Final_Output": {
+          "Score_Variable": "Soros_Bubble_Audit_Score",
+          "Signal_Type": "Suppress_Growth_Signals / Monitor_Trend",
+          "State_Flags": ["Late_Stage_Bubble", "Rational_Exuberance", "Mean_Reversion_Imminent"],
+          "Range": "0.0 ~ 1.113"
+        }
+      }
+    ],
+    "Logical_Edges": [
+      {
+        "Edge_ID": "EDGE_GRO_001",
+        "Source": "GRO_FISHER_001",
+        "Target": "GRO_LYNCH_001",
+        "Relationship_Type": "Continuous_Synergy",
+        "Condition_Regime": ["Normal_Market", "Innovation_Cycle"],
+        "Logic": "Target_Score = Target_Score * (1.0 + 0.3 * Source_Score) -- Continuous boost based on Fisher"
+      },
+      {
+        "Edge_ID": "EDGE_GRO_002",
+        "Source": "GRO_SOROS_001",
+        "Target": "GRO_LYNCH_001",
+        "Relationship_Type": "Continuous_Discount",
+        "Condition_Regime": ["Late_Bull_Market", "Liquidity_Excess"],
+        "Logic": "Target_Score = Target_Score * max(0.1, 1.0 - Source_Score) -- Continuous discount by Soros bubble score"
+      }
+    ]
+  }

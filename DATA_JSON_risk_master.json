@@ -1,0 +1,160 @@
+{
+    "Ontology_Schema": "H-PIOS_v8.5_GraphRAG_Master",
+    "Engine_Domain": "Risk_and_Sizing",
+    "Last_Update": "2026-03-09",
+    "Nodes": [
+      {
+        "Node_ID": "RSK_TALEB_001",
+        "Master": "Nassim Taleb",
+        "Core_Concept": "Black_Swan_and_Antifragility",
+        "Full_Description": "정규분포를 벗어난 극단적 꼬리 위험(Fat Tail) 감지 및 파산 리스크로부터의 시스템 붕괴 방어",
+        "Intelligence_Structure": {
+          "Step_1_Quantitative_Analysis": {
+            "metrics": [
+              { "metric": "SKEW_Index", "operator": ">", "threshold": 140, "weight": 0.5, "logic_formula": "IF SKEW_Index > 140 THEN +0.5 ELSE 0" },
+              { "metric": "OTM_Put_Option_Volume_Spike", "operator": ">", "threshold": 3.0, "unit": "Sigma", "weight": 0.5, "logic_formula": "IF OTM_Put_Option_Volume_Spike > 3.0 THEN +0.5 ELSE 0" }
+            ],
+            "output_variable": "L_quant_taleb"
+          },
+          "Step_2_Qualitative_Context": {
+            "nlp_confidence_threshold": 0.95,
+            "scenarios": [
+              {
+                "condition": "Global news on 'Geopolitical Catastrophe', 'Nuclear Threat', or 'Pandemic'",
+                "score_modifier": 0.8,
+                "context": "외생적 블랙 스완(Exogenous Shock) 발발 및 모델링 불가능한 영역 진입",
+                "keywords": ["지정학적 파국", "핵 위협", "팬데믹", "블랙스완", "전례 없는"]
+              },
+              {
+                "condition": "Systemic 'Contagion' OR 'Liquidity Evaporation' news with VIX spike",
+                "score_modifier": 0.7,
+                "context": "내생적 시스템 붕괴 및 금융 네트워크의 연쇄 파산 위험",
+                "keywords": ["연쇄 파산", "유동성 증발", "시스템 붕괴", "디폴트 도미노"]
+              }
+            ],
+            "output_variable": "L_qual_taleb"
+          },
+          "Step_3_Statistical_Correction": {
+            "formula": "(L_quant_taleb + L_qual_taleb) * historical_win_rate * decay_factor",
+            "constants": {
+              "historical_win_rate": 0.99,
+              "decay_factor": 1.0,
+              "regime_performance": { "Tail_Risk_Event": 1.0, "Normal_Market": "N/A" }
+            }
+          }
+        },
+        "Final_Output": {
+          "Score_Variable": "Taleb_Ruin_Probability",
+          "Signal_Type": "Master_Override_Shutdown",
+          "State_Flags": ["System_Normal", "Extreme_Hedge_Required", "Liquidation_Mode"],
+          "Range": "0.0 ~ 1.98"
+        }
+      },
+      {
+        "Node_ID": "RSK_SHANNON_001",
+        "Master": "Claude Shannon",
+        "Core_Concept": "Signal_to_Noise_Ratio",
+        "Full_Description": "시장 데이터의 정보 이론적 해석을 통한 시그널의 순도 검증 및 잡음(Noise) 기반 신뢰도 필터링",
+        "Intelligence_Structure": {
+          "Step_1_Quantitative_Analysis": {
+            "metrics": [
+              { "metric": "Price_Trend_R_Squared", "operator": "<", "threshold": 0.3, "weight": 0.6, "logic_formula": "IF Price_Trend_R_Squared < 0.3 THEN +0.6 ELSE 0" },
+              { "metric": "Intraday_Volatility_vs_Daily_Return", "operator": ">", "threshold": 2.5, "weight": 0.4, "logic_formula": "IF Intraday_Volatility_vs_Daily_Return > 2.5 THEN +0.4 ELSE 0" }
+            ],
+            "output_variable": "L_quant_shannon"
+          },
+          "Step_2_Qualitative_Context": {
+            "nlp_confidence_threshold": 0.80,
+            "scenarios": [
+              {
+                "condition": "Reports mention 'Lack of Direction' or 'Wait-and-see' with low volume",
+                "score_modifier": 0.5,
+                "context": "노이즈 우위의 비효율적 횡보 및 정보 가치 부재 상태",
+                "keywords": ["혼조세", "방향성 부재", "눈치 보기 장세", "잡음"]
+              },
+              {
+                "condition": "Post-macro release 'Conflicting Views' and intraday whipsaws",
+                "score_modifier": 0.5,
+                "context": "정보 비대칭 및 시각차로 인한 신호 왜곡 심화",
+                "keywords": ["휩소(Whipsaw)", "해석 분분", "변동성 확대", "가짜 신호"]
+              }
+            ],
+            "output_variable": "L_qual_shannon"
+          },
+          "Step_3_Statistical_Correction": {
+            "formula": "MAX(0.1, 1.0 - ((L_quant_shannon + L_qual_shannon) * historical_win_rate * decay_factor))",
+            "constants": {
+              "historical_win_rate": 0.70,
+              "decay_factor": 0.97,
+              "regime_performance": { "High_Noise": 0.85, "Strong_Trend": 0.60 }
+            }
+          }
+        },
+        "Final_Output": {
+          "Score_Variable": "Shannon_Confidence_Factor",
+          "Signal_Type": "Volatility_Filter",
+          "State_Flags": ["Clear_Signal", "High_Noise", "Information_Gap"],
+          "Range": "0.1 ~ 1.0"
+        }
+      },
+      {
+        "Node_ID": "RSK_THORP_001",
+        "Master": "Edward Thorp",
+        "Core_Concept": "Kelly_Criterion_Position_Sizing",
+        "Full_Description": "승률과 손익비를 바탕으로 파산 확률을 0으로 만드는 수학적 최적 베팅 규모(자본 투입량) 결정",
+        "Intelligence_Structure": {
+          "Step_1_Quantitative_Analysis": {
+            "metrics": [
+              { "metric": "Expected_Value_of_Signal", "operator": ">", "threshold": 0.0, "weight": 0.5 },
+              { "metric": "Historical_Win_Rate_of_Signal", "operator": ">", "threshold": 0.5, "weight": 0.5 }
+            ],
+            "output_variable": "Base_Kelly_Fraction"
+          },
+          "Step_2_Qualitative_Context": {
+            "nlp_confidence_threshold": 0.75,
+            "scenarios": [
+              {
+                "condition": "Report mentions 'Clear Catalyst' AND 'Limited Downside'",
+                "score_modifier": 0.2,
+                "context": "비대칭적 보상 구조 확증으로 인한 베팅 프리미엄 부여",
+                "keywords": ["확실한 촉매", "제한적 하방 리스크", "비대칭적 보상", "확실한 엣지"]
+              }
+            ],
+            "output_variable": "Edge_Conviction_Premium"
+          },
+          "Step_3_Statistical_Correction": {
+            "formula": "Base_Kelly_Fraction * Shannon_Confidence_Factor * (1 + Edge_Conviction_Premium) * historical_win_rate * decay_factor",
+            "constants": {
+              "historical_win_rate": 0.82,
+              "decay_factor": 0.98,
+              "formula_reference": "Kelly Criterion: f* = (bp-q)/b"
+            }
+          }
+        },
+        "Final_Output": {
+          "Score_Variable": "Thorp_Optimal_Position_Size",
+          "Signal_Type": "Capital_Allocation_Command",
+          "State_Flags": ["Full_Kelly", "Half_Kelly", "Fractional_Bet", "Zero_Bet"],
+          "Range": "0.0% ~ Max_Risk_Limit"
+        }
+      }
+    ],
+    "Logical_Edges": [
+      {
+        "Edge_ID": "EDGE_RSK_001",
+        "Source": "RSK_TALEB_001",
+        "Target": "ALL_OTHER_ENGINES",
+        "Relationship_Type": "Continuous_Master_Discount",
+        "Condition_Regime": ["Tail_Risk_Event", "Systemic_Crash"],
+        "Logic": "Target_Score = Target_Score * exp(-Source_Score * 3) -- Exponential decay based on Taleb risk"
+      },
+      {
+        "Edge_ID": "EDGE_RSK_002",
+        "Source": "RSK_SHANNON_001",
+        "Target": "RSK_THORP_001",
+        "Relationship_Type": "Continuous_Discount",
+        "Condition_Regime": ["High_Noise_Market", "Sideways"],
+        "Logic": "Target_Score = Target_Score * Source_Score -- Shannon confidence continuously scales Thorp"
+      }
+    ]
+  }
