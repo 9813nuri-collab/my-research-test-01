@@ -1,20 +1,22 @@
 """
 H-PIOS v8.6 — Core Execution Engine (Balanced Intelligence Protocol)
 ======================================================================
-12인 투자 거장의 마스터 JSON으로부터 동적 추론 로직을 구동하는
-실전 헤지펀드 수준의 엔진 코어입니다.
+Core engine driving dynamic reasoning logic from the Master JSON
+of 12 investment maestros, at production hedge-fund grade.
 
 [v8.6 Update Note]
 ------------------
 1. **Pessimism Bias Systemic Fix**: 
-   - Step 1 Quantitative Analysis의 시작 베이스 점수를 0.2로 설정함으로써, 
-     데이터 부재가 곧바로 강력 매도 신호로 이어지는 편향을 제거함.
+   - Sets the Step 1 Quantitative Analysis base score floor to 0.2,
+     eliminating the bias where missing data immediately triggers a strong sell signal.
 2. **Collective Intelligence (Weighted Ensemble)**:
-   - 전문가의 확신도(Confidence, 0.18 중립점에서의 거리)에 비례한 지수 가중치 적용.
-   - 침묵하는 다수의 소음보다 외치는 소수 전문가의 목소리를 우선함.
+   - Applies exponential weighting proportional to each expert's conviction
+     (distance from the 0.18 neutral point).
+   - Prioritizes the voices of a few outspoken experts over the noise of a silent majority.
 3. **Organic Tension Tuning**:
-   - 시너지 증폭(Synergy Boost) 계수를 0.5에서 0.8로 상향하여 우량주 간 결합력 강화.
-   - 리스크 감원폭 및 매크로 보정 계수의 유연성 확보.
+   - Raises the Synergy Boost coefficient from 0.5 to 0.8 to strengthen
+     coupling between high-quality stocks.
+   - Ensures flexibility in risk discount amplitude and macro correction coefficients.
 """
 
 from __future__ import annotations
@@ -60,24 +62,43 @@ from CORE_MODELS_models import (
 
 logger = logging.getLogger("H-PIOS.engine_core")
 
+# -----------------------------------------------------------------------------
+# Korean in logs, ValueError messages, and audit_log lines is intentional
+# (unchanged for stable tooling / local ops). English gloss for reviewers:
+#   수식 평가 깊이 초과 — expression evaluation depth exceeded
+#   알 수 없는 변수 — unknown variable; 사용 가능한 변수 — available variables
+#   허용되지 않은 … 연산 — disallowed binary/unary/compare/logic operation
+#   호출 불가능한 객체 — not callable
+#   수식 파싱 실패 — formula parse failed; 원인 — cause
+#   유효한 거래 이력이 없어 승률 갱신 불가 — cannot update win rate (no trades)
+#   롤링 승률 갱신 — rolling win-rate update
+#   지표 … 데이터 없음 → 0점 — metric missing → score 0
+#   수식 평가 실패 … → 0점 — formula eval failed → score 0
+#   발동 — triggered; 위상 정렬 — topological sort; 순환 참조 — cycle detected
+#   Soft-Shutdown 적용 — soft shutdown applied; 시너지/억제/연속전이 — synergy / suppress / continuous transfer
+#   앙상블 대상 노드 없음 — no ensemble nodes; 신뢰도 필터 — confidence filter
+#   등록되지 않은 노드 — unregistered node; SPG 판정/ VETO / Floor — policy governor messages
+# -----------------------------------------------------------------------------
+
 
 # ══════════════════════════════════════════════════════════
-# 1. Safe Formula Evaluator — AST 기반 안전 수식 평가
+# 1. Safe Formula Evaluator — AST-Based Secure Expression Evaluator
 # ══════════════════════════════════════════════════════════
 
 class SafeFormulaEvaluator:
-    """AST 기반 제한된 수식 평가기.
+    """AST-based restricted expression evaluator.
 
-    보안 및 런타임 안정성을 위해 Python의 기본 ``eval()``을 사용하지 않고,
-    ``ast`` 모듈로 파싱한 뒤 허용된 연산/함수만 화이트리스트로 실행합니다.
+    For security and runtime stability, this evaluator avoids Python's
+    built-in ``eval()`` and instead parses expressions via the ``ast`` module,
+    executing only whitelisted operations and functions.
 
-    허용 연산:
-        - 산술: ``+``, ``-``, ``*``, ``/``, ``**``, ``%``
-        - 비교: ``<``, ``<=``, ``>``, ``>=``, ``==``, ``!=``
-        - 논리: ``and``, ``or``, ``not``
-        - 단항: ``-``, ``+``
-        - 내장 함수: ``MAX``, ``MIN``, ``ABS``, ``ROUND``, ``LOG``, ``EXP``, ``SQRT``
-        - 삼항(IF-THEN-ELSE) 패턴도 전처리로 지원
+    Permitted operations:
+        - Arithmetic: ``+``, ``-``, ``*``, ``/``, ``**``, ``%``
+        - Comparison: ``<``, ``<=``, ``>``, ``>=``, ``==``, ``!=``
+        - Logical: ``and``, ``or``, ``not``
+        - Unary: ``-``, ``+``
+        - Built-in functions: ``MAX``, ``MIN``, ``ABS``, ``ROUND``, ``LOG``, ``EXP``, ``SQRT``
+        - Ternary (IF-THEN-ELSE) patterns are supported via preprocessing
 
     Usage::
 
@@ -90,7 +111,7 @@ class SafeFormulaEvaluator:
         )
     """
 
-    # 허용된 이항 연산자 매핑
+    # Permitted binary operator mapping
     _BINARY_OPS: Dict[type, Callable] = {
         ast.Add: operator.add,
         ast.Sub: operator.sub,
@@ -100,7 +121,7 @@ class SafeFormulaEvaluator:
         ast.Mod: operator.mod,
     }
 
-    # 허용된 비교 연산자 매핑
+    # Permitted comparison operator mapping
     _COMPARE_OPS: Dict[type, Callable] = {
         ast.Lt: operator.lt,
         ast.LtE: operator.le,
@@ -110,14 +131,14 @@ class SafeFormulaEvaluator:
         ast.NotEq: operator.ne,
     }
 
-    # 허용된 단항 연산자
+    # Permitted unary operators
     _UNARY_OPS: Dict[type, Callable] = {
         ast.UAdd: operator.pos,
         ast.USub: operator.neg,
         ast.Not: operator.not_,
     }
 
-    # 허용된 내장 함수 (대소문자 무시)
+    # Permitted built-in functions (case-insensitive)
     _SAFE_FUNCTIONS: Dict[str, Callable] = {
         "MAX": max,
         "MIN": min,
@@ -135,41 +156,41 @@ class SafeFormulaEvaluator:
         "sqrt": math.sqrt,
     }
 
-    # AST 노드 최대 깊이 (무한 재귀 방어)
+    # Maximum AST node depth (guards against infinite recursion)
     _MAX_DEPTH: int = 50
 
     def __init__(self, extra_functions: Optional[Dict[str, Callable]] = None) -> None:
-        """SafeFormulaEvaluator를 초기화합니다.
+        """Initialize the SafeFormulaEvaluator.
 
         Args:
-            extra_functions: 추가 허용 함수 매핑 (선택).
-                예: ``{"SIGMOID": lambda x: 1/(1+math.exp(-x))}``
+            extra_functions: Additional permitted function mapping (optional).
+                e.g., ``{"SIGMOID": lambda x: 1/(1+math.exp(-x))}``
         """
         self._functions = dict(self._SAFE_FUNCTIONS)
         if extra_functions:
             self._functions.update(extra_functions)
 
-    # ── 전처리: JSON 수식의 IF-THEN-ELSE → Python 삼항 변환 ──
+    # ── Preprocessing: Convert JSON IF-THEN-ELSE to Python ternary ──
 
     @staticmethod
     def _preprocess_formula(formula: str) -> str:
-        """JSON 수식의 비표준 패턴을 Python AST 호환 형태로 전처리.
+        """Preprocess non-standard JSON formula patterns into Python AST-compatible form.
 
-        지원 변환:
+        Supported transformations:
             - ``IF <cond> THEN <val1> ELSE <val2>``
               → ``(<val1>) if (<cond>) else (<val2>)``
-            - 변수명의 특수문자(``/``, ``-`` 등)를 ``_``로 치환하여
-              Python AST 호환 식별자로 정규화
+            - Normalizes special characters in variable names (``/``, ``-``, etc.)
+              to ``_`` for Python AST-compatible identifiers
 
         Args:
-            formula: 원본 수식 문자열
+            formula: Original formula string
 
         Returns:
-            Python AST 호환 수식 문자열
+            Python AST-compatible formula string
         """
         import re
 
-        # IF ... THEN ... ELSE ... 패턴 변환 (중첩 미지원, 단일 레벨)
+        # Convert IF ... THEN ... ELSE ... pattern (single level, no nesting)
         pattern = r"IF\s+(.+?)\s+THEN\s+(.+?)\s+ELSE\s+(.+?)(?:\s*$|\s*\))"
         
         def _replace_if(match: re.Match) -> str:
@@ -179,37 +200,37 @@ class SafeFormulaEvaluator:
             return f"(({then_val}) if ({cond}) else ({else_val}))"
 
         result = formula
-        # 반복 치환 (중첩 대응)
+        # Iterative substitution (handles nested cases)
         for _ in range(5):
             new_result = re.sub(pattern, _replace_if, result, flags=re.IGNORECASE)
             if new_result == result:
                 break
             result = new_result
 
-        # 변수명 특수문자 정규화: P/E_Ratio → P_E_Ratio 등
-        # 알파벳/숫자/_ 로 구성된 식별자 사이의 / 를 _ 로 치환
+        # Normalize special characters in variable names: P/E_Ratio → P_E_Ratio
+        # Replace '/' between alphanumeric/_ characters with '_'
         result = re.sub(r'(?<=[A-Za-z0-9_])/(?=[A-Za-z0-9_])', '_', result)
-        # 식별자 내부의 - 도 _ 로 치환 (예: Debt-to-Equity → Debt_to_Equity)
+        # Replace '-' within identifiers with '_' (e.g., Debt-to-Equity → Debt_to_Equity)
         result = re.sub(r'(?<=[A-Za-z0-9_])-(?=[A-Za-z])', '_', result)
 
         return result
 
-    # ── AST 노드 평가 (재귀적 트리 워크) ──
+    # ── AST node evaluation (recursive tree walk) ──
 
     def _eval_node(self, node: ast.AST, context: Dict[str, Any], depth: int = 0) -> Any:
-        """AST 노드를 안전하게 재귀 평가합니다.
+        """Recursively evaluate an AST node in a safe manner.
 
         Args:
-            node: AST 노드
-            context: 변수명 → 값 매핑
-            depth: 현재 재귀 깊이
+            node: AST node
+            context: Variable name → value mapping
+            depth: Current recursion depth
 
         Returns:
-            평가 결과 (float, bool 등)
+            Evaluation result (float, bool, etc.)
 
         Raises:
-            RecursionError: 깊이 초과 시
-            ValueError: 허용되지 않은 AST 노드 감지 시
+            RecursionError: When maximum depth is exceeded
+            ValueError: When a disallowed AST node is encountered
         """
         if depth > self._MAX_DEPTH:
             raise RecursionError(
@@ -217,14 +238,14 @@ class SafeFormulaEvaluator:
                 "수식이 너무 복잡하거나 순환 참조가 있을 수 있습니다."
             )
 
-        # ── 상수(Constant) ──
+        # ── Constant ──
         if isinstance(node, ast.Constant):
             return node.value
 
-        # ── 변수(Name) ──
+        # ── Variable (Name) ──
         if isinstance(node, ast.Name):
             name = node.id
-            # 내장 함수명이면 Callable 반환
+            # Return callable if it matches a built-in function name
             if name in self._functions:
                 return self._functions[name]
             if name in context:
@@ -234,7 +255,7 @@ class SafeFormulaEvaluator:
                 f"사용 가능한 변수: {list(context.keys())}"
             )
 
-        # ── 이항 연산(BinOp) ──
+        # ── Binary operation (BinOp) ──
         if isinstance(node, ast.BinOp):
             op_func = self._BINARY_OPS.get(type(node.op))
             if op_func is None:
@@ -243,7 +264,7 @@ class SafeFormulaEvaluator:
             right = self._eval_node(node.right, context, depth + 1)
             return op_func(left, right)
 
-        # ── 단항 연산(UnaryOp) ──
+        # ── Unary operation (UnaryOp) ──
         if isinstance(node, ast.UnaryOp):
             op_func = self._UNARY_OPS.get(type(node.op))
             if op_func is None:
@@ -251,7 +272,7 @@ class SafeFormulaEvaluator:
             operand = self._eval_node(node.operand, context, depth + 1)
             return op_func(operand)
 
-        # ── 비교(Compare) ──
+        # ── Comparison (Compare) ──
         if isinstance(node, ast.Compare):
             left = self._eval_node(node.left, context, depth + 1)
             for op_node, comparator in zip(node.ops, node.comparators):
@@ -264,7 +285,7 @@ class SafeFormulaEvaluator:
                 left = right
             return True
 
-        # ── 논리 연산(BoolOp) ──
+        # ── Boolean operation (BoolOp) ──
         if isinstance(node, ast.BoolOp):
             if isinstance(node.op, ast.And):
                 return all(
@@ -276,7 +297,7 @@ class SafeFormulaEvaluator:
                 )
             raise ValueError(f"허용되지 않은 논리 연산: {type(node.op).__name__}")
 
-        # ── 함수 호출(Call) ──
+        # ── Function call (Call) ──
         if isinstance(node, ast.Call):
             func = self._eval_node(node.func, context, depth + 1)
             if not callable(func):
@@ -284,14 +305,14 @@ class SafeFormulaEvaluator:
             args = [self._eval_node(a, context, depth + 1) for a in node.args]
             return func(*args)
 
-        # ── 삼항 표현식(IfExp) ──
+        # ── Ternary expression (IfExp) ──
         if isinstance(node, ast.IfExp):
             test = self._eval_node(node.test, context, depth + 1)
             if test:
                 return self._eval_node(node.body, context, depth + 1)
             return self._eval_node(node.orelse, context, depth + 1)
 
-        # ── Expression 래퍼 ──
+        # ── Expression wrapper ──
         if isinstance(node, ast.Expression):
             return self._eval_node(node.body, context, depth + 1)
 
@@ -300,20 +321,20 @@ class SafeFormulaEvaluator:
             "보안상 제한된 수식만 평가 가능합니다."
         )
 
-    # ── 공개 API ──
+    # ── Public API ──
 
     @staticmethod
     def _normalize_key(key: str) -> str:
-        """변수명의 특수문자를 _로 정규화합니다.
+        """Normalize special characters in variable names to underscores.
 
-        _preprocess_formula와 동일한 규칙으로 context 키를 정규화하여
-        수식 내 변수명과 일치시킵니다.
+        Applies the same rules as ``_preprocess_formula`` to normalize
+        context keys so they match variable names within formulas.
 
         Args:
-            key: 원본 변수명
+            key: Original variable name
 
         Returns:
-            정규화된 변수명
+            Normalized variable name
         """
         import re
         result = re.sub(r'(?<=[A-Za-z0-9_])/(?=[A-Za-z0-9_])', '_', key)
@@ -321,26 +342,26 @@ class SafeFormulaEvaluator:
         return result
 
     def evaluate(self, formula: str, context: Dict[str, Any]) -> float:
-        """수식 문자열을 안전하게 평가합니다.
+        """Safely evaluate a formula string.
 
         Args:
-            formula: 수식 문자열 (JSON에서 로드)
-            context: 변수명 → 값 매핑 (Step 1/2 출력, 상수 등)
+            formula: Formula string (loaded from JSON)
+            context: Variable name → value mapping (Step 1/2 outputs, constants, etc.)
 
         Returns:
-            평가 결과 (float)
+            Evaluation result (float)
 
         Raises:
-            ValueError: 수식 파싱/평가 실패 시
-            RecursionError: 깊이 초과 시
+            ValueError: When formula parsing/evaluation fails
+            RecursionError: When maximum depth is exceeded
         """
         preprocessed = self._preprocess_formula(formula)
 
-        # context 키도 동일 규칙으로 정규화 (P/E_Ratio → P_E_Ratio)
+        # Normalize context keys with the same rules (P/E_Ratio → P_E_Ratio)
         normalized_ctx: Dict[str, Any] = {}
         for k, v in context.items():
             normalized_ctx[self._normalize_key(k)] = v
-            # 원본 키도 유지 (정규화 전 키로 참조되는 경우 대비)
+            # Retain the original key as well (in case it is referenced pre-normalization)
             if k != self._normalize_key(k):
                 normalized_ctx[k] = v
 
@@ -354,85 +375,85 @@ class SafeFormulaEvaluator:
 
         result = self._eval_node(tree, normalized_ctx)
 
-        # bool → float 변환 (True=1.0, False=0.0)
+        # Convert bool → float (True=1.0, False=0.0)
         if isinstance(result, bool):
             return 1.0 if result else 0.0
         return float(result)
 
 
 # ══════════════════════════════════════════════════════════
-# 2. Score Normalizer — 플러그인 가능한 정규화 전략
+# 2. Score Normalizer — Pluggable Normalization Strategies
 # ══════════════════════════════════════════════════════════
 
 @runtime_checkable
 class ScoreNormalizer(Protocol):
-    """점수 정규화 프로토콜 (Pluggable Design).
+    """Score normalization protocol (pluggable design).
 
-    모든 정규화 전략은 이 프로토콜을 구현해야 합니다.
-    0.0 ~ 1.0 사이의 정규화된 점수를 반환합니다.
+    All normalization strategies must implement this protocol.
+    Returns a normalized score in the range [0.0, 1.0].
     """
 
     def normalize(self, raw_score: float, **kwargs: Any) -> float:
-        """원시 점수를 0.0 ~ 1.0으로 정규화합니다.
+        """Normalize a raw score to the [0.0, 1.0] range.
 
         Args:
-            raw_score: 정규화 전 원시 점수
-            **kwargs: 전략별 추가 파라미터
+            raw_score: Pre-normalization raw score
+            **kwargs: Strategy-specific additional parameters
 
         Returns:
-            0.0 ~ 1.0 사이의 정규화 점수
+            Normalized score in [0.0, 1.0]
         """
         ...
 
 
 class SigmoidNormalizer:
-    """Sigmoid 정규화기 (기본 전략).
+    """Sigmoid normalizer (default strategy).
 
-    수식: f(x) = 1 / (1 + e^(-k * (x - x0)))
+    Formula: f(x) = 1 / (1 + e^(-k * (x - x0)))
 
     Parameters:
-        k: 기울기 계수 (클수록 급격한 전환). 기본 5.0
-        x0: 중심점 (시그모이드의 0.5 지점). 기본 0.5
+        k: Slope coefficient (larger values yield sharper transitions). Default 5.0
+        x0: Center point (the 0.5 inflection point of the sigmoid). Default 0.5
     """
 
     def __init__(self, k: float = 5.0, x0: float = 0.5) -> None:
-        """SigmoidNormalizer를 초기화합니다.
+        """Initialize the SigmoidNormalizer.
 
         Args:
-            k: 기울기 계수 (기본 5.0)
-            x0: 중심점 (기본 0.5)
+            k: Slope coefficient (default 5.0)
+            x0: Center point (default 0.5)
         """
         self.k = k
         # [Calibration] x0 set to 0.21 for academic zero-point (Baseline maps to ~0.55)
         self.x0 = 0.21
 
     def normalize(self, raw_score: float, **kwargs: Any) -> float:
-        """Sigmoid 함수로 정규화합니다.
+        """Normalize using the sigmoid function.
 
         Args:
-            raw_score: 원시 점수
-            **kwargs: 무시됨 (프로토콜 호환용)
+            raw_score: Raw score
+            **kwargs: Ignored (for protocol compatibility)
 
         Returns:
-            0.0 ~ 1.0 사이의 정규화 점수
+            Normalized score in [0.0, 1.0]
         """
         try:
             return 1.0 / (1.0 + math.exp(-self.k * (raw_score - self.x0)))
         except OverflowError:
-            # exp 오버플로우: 극단값 처리
+            # Handle exp overflow for extreme values
             return 0.0 if raw_score < self.x0 else 1.0
 
 
 class ZScoreNormalizer:
-    """Z-Score 기반 정규화기.
+    """Z-Score-based normalizer.
 
-    원시 점수를 이동 평균/표준편차 대비 표준화한 뒤,
-    Sigmoid로 0~1 범위에 매핑합니다.
+    Standardizes raw scores against a moving mean/standard deviation,
+    then maps the result to [0, 1] via a sigmoid.
 
     Parameters:
-        mean: 이동 평균 (기본 0.0)
-        std: 이동 표준편차 (기본 1.0)
-        sigmoid_k: 후단 Sigmoid 기울기 (기본 1.5)
+        mean: Moving average (default 0.0)
+        std: Moving standard deviation (default 1.0)
+        sigmoid_k: Post-stage sigmoid slope (default 1.5)
     """
 
     def __init__(
@@ -443,33 +464,33 @@ class ZScoreNormalizer:
         self._sigmoid = SigmoidNormalizer(k=sigmoid_k, x0=0.0)
 
     def normalize(self, raw_score: float, **kwargs: Any) -> float:
-        """Z-Score → Sigmoid로 정규화합니다.
+        """Normalize via Z-Score → Sigmoid.
 
         Args:
-            raw_score: 원시 점수
+            raw_score: Raw score
             **kwargs:
-                mean (float): 동적 평균 (선택)
-                std (float): 동적 표준편차 (선택)
+                mean (float): Dynamic mean (optional)
+                std (float): Dynamic standard deviation (optional)
 
         Returns:
-            0.0 ~ 1.0 사이의 정규화 점수
+            Normalized score in [0.0, 1.0]
         """
         mean = kwargs.get("mean", self.mean)
         std = kwargs.get("std", self.std)
         if std == 0:
-            std = 1e-8  # 제로 분산 방어
+            std = 1e-8  # Guard against zero variance
         z = (raw_score - mean) / std
         return self._sigmoid.normalize(z)
 
 
 class MinMaxNormalizer:
-    """Min-Max 정규화기.
+    """Min-Max normalizer.
 
-    이력 최솟값/최댓값 기반으로 선형 정규화합니다.
+    Performs linear normalization based on historical minimum/maximum values.
 
     Parameters:
-        min_val: 이력 최솟값 (기본 0.0)
-        max_val: 이력 최댓값 (기본 2.0)
+        min_val: Historical minimum (default 0.0)
+        max_val: Historical maximum (default 2.0)
     """
 
     def __init__(self, min_val: float = 0.0, max_val: float = 2.0) -> None:
@@ -477,16 +498,16 @@ class MinMaxNormalizer:
         self.max_val = max_val
 
     def normalize(self, raw_score: float, **kwargs: Any) -> float:
-        """Min-Max 정규화를 수행합니다.
+        """Perform Min-Max normalization.
 
         Args:
-            raw_score: 원시 점수
+            raw_score: Raw score
             **kwargs:
-                min_val (float): 동적 최솟값 (선택)
-                max_val (float): 동적 최댓값 (선택)
+                min_val (float): Dynamic minimum (optional)
+                max_val (float): Dynamic maximum (optional)
 
         Returns:
-            0.0 ~ 1.0 사이의 정규화 점수 (클리핑 적용)
+            Normalized score in [0.0, 1.0] (clipped)
         """
         lo = kwargs.get("min_val", self.min_val)
         hi = kwargs.get("max_val", self.max_val)
@@ -497,26 +518,26 @@ class MinMaxNormalizer:
 
 
 # ══════════════════════════════════════════════════════════
-# 3. AbstractMasterEngine — 개별 거장 노드 실행 엔진
+# 3. AbstractMasterEngine — Individual Maestro Node Execution Engine
 # ══════════════════════════════════════════════════════════
 
 class AbstractMasterEngine:
-    """12인 투자 거장 개별 노드 실행 엔진.
+    """Execution engine for an individual investment maestro node (one of 12).
 
-    MasterNode JSON 구조를 기반으로 3-Step 추론 파이프라인을 실행하고,
-    정규화된 최종 점수를 산출합니다.
+    Runs a 3-step reasoning pipeline based on the MasterNode JSON structure
+    and produces a normalized final score.
 
-    핵심 기능:
-        - Step 1: 정량 분석 (logic_formula 동적 평가)
-        - Step 2: 정성 평가 (NLP 키워드/코사인 유사도 기반)
-        - Step 3: 통계 보정 (formula 동적 평가)
-        - 정규화: 플러그인 가능한 Normalizer (기본 Sigmoid)
-        - 승률 갱신: update_rolling_win_rate()로 동적 덮어쓰기
+    Core capabilities:
+        - Step 1: Quantitative analysis (dynamic evaluation of logic_formula)
+        - Step 2: Qualitative assessment (NLP keyword / cosine similarity based)
+        - Step 3: Statistical correction (dynamic evaluation of formula)
+        - Normalization: Pluggable normalizer (default: Sigmoid)
+        - Win-rate update: Dynamically overrides via update_rolling_win_rate()
 
     Args:
-        node: MasterNode Pydantic 모델
-        normalizer: ScoreNormalizer 프로토콜 구현체 (기본 SigmoidNormalizer)
-        evaluator: SafeFormulaEvaluator 인스턴스 (공유 가능)
+        node: MasterNode Pydantic model
+        normalizer: ScoreNormalizer protocol implementation (default: SigmoidNormalizer)
+        evaluator: SafeFormulaEvaluator instance (shareable)
     """
 
     def __init__(
@@ -529,30 +550,31 @@ class AbstractMasterEngine:
         self.normalizer: ScoreNormalizer = normalizer or SigmoidNormalizer()
         self.evaluator = evaluator or SafeFormulaEvaluator()
 
-        # JSON 초기값을 기본 승률로 저장
+        # Store the JSON initial value as the default win rate
         self._default_win_rate: float = (
             node.Intelligence_Structure
             .Step_3_Statistical_Correction
             .historical_win_rate
         )
-        # 동적 롤링 승률 (None이면 default 사용)
+        # Dynamic rolling win rate (None falls back to default)
         self._rolling_win_rate: Optional[float] = None
 
-        # 엔진 상태
+        # Engine state
         self.state = EngineState(node_id=node.Node_ID)
 
-    # ── 프로퍼티 ──
+    # ── Properties ──
 
     @property
     def node_id(self) -> str:
-        """노드 고유 식별자."""
+        """Unique node identifier."""
         return self.node.Node_ID
 
     @property
     def effective_win_rate(self) -> float:
-        """현재 유효 승률.
+        """Current effective win rate.
 
-        동적 롤링 승률이 설정되었으면 그 값을, 아니면 JSON 초기값을 반환합니다.
+        Returns the dynamic rolling win rate if set; otherwise returns
+        the JSON-defined initial value.
         """
         if self._rolling_win_rate is not None:
             return self._rolling_win_rate
@@ -560,24 +582,24 @@ class AbstractMasterEngine:
             return self.state.rolling_win_rate
         return self._default_win_rate
 
-    # ── 승률 갱신 ──
+    # ── Win-rate update ──
 
     def update_rolling_win_rate(
         self, performance: PerformanceState
     ) -> float:
-        """외부 백테스트/라이브 성과 데이터로 롤링 승률을 동적 갱신합니다.
+        """Dynamically update the rolling win rate from external backtest/live performance data.
 
-        JSON의 historical_win_rate는 초기값(Default)으로만 취급되며,
-        이 메서드가 호출되면 동적으로 덮어씁니다.
+        The JSON ``historical_win_rate`` is treated only as the initial default;
+        once this method is called, it is dynamically overridden.
 
         Args:
-            performance: 성과 추적 상태 (PerformanceState)
+            performance: Performance tracking state (PerformanceState)
 
         Returns:
-            갱신된 롤링 승률
+            Updated rolling win rate
 
         Raises:
-            ValueError: 유효한 거래 이력이 없는 경우
+            ValueError: When no valid trade history is available
         """
         calculated = performance.calculated_win_rate
         if calculated is None:
@@ -597,29 +619,29 @@ class AbstractMasterEngine:
         )
         return calculated
 
-    # ── Step 1: 정량 분석 ──
+    # ── Step 1: Quantitative Analysis ──
 
     def _execute_step1(
         self, market_data: MarketDataPayload
     ) -> float:
-        """Step 1: 정량 분석을 실행합니다.
+        """Execute Step 1: Quantitative Analysis.
 
-        각 QuantMetric의 logic_formula를 SafeFormulaEvaluator로 평가하고,
-        결과를 합산합니다.
+        Evaluates each QuantMetric's logic_formula via SafeFormulaEvaluator
+        and sums the results.
 
         Args:
-            market_data: 재무/매크로 정량 데이터 페이로드
+            market_data: Financial/macro quantitative data payload
 
         Returns:
-            Step 1 정량 점수 합계
+            Step 1 quantitative score (sum)
         """
         step1 = self.node.Intelligence_Structure.Step_1_Quantitative_Analysis
-        # [v8.6] Pessimism Bias Systemic Fix - 베이스 점수 하한 0.2 설정
-        # (기존 additive 방식에서 max 방식으로 변경하여 Bullish Bias 방지)
+        # [v8.6] Pessimism Bias Systemic Fix — base score floor set to 0.2
+        # (Changed from additive to max to prevent Bullish Bias)
         total_score = 0.0
 
         for metric_def in step1.metrics:
-            # 원본 키 및 정규화 키 모두로 조회 (P/E_Ratio 등 대응)
+            # Look up by both original and normalized keys (handles P/E_Ratio, etc.)
             metric_value = market_data.metrics.get(metric_def.metric)
             if metric_value is None:
                 normalized_key = self.evaluator._normalize_key(metric_def.metric)
@@ -633,7 +655,7 @@ class AbstractMasterEngine:
                 continue
 
             if metric_def.logic_formula:
-                # logic_formula를 SafeEval로 동적 해석
+                # Dynamically interpret logic_formula via SafeEval
                 context = {metric_def.metric: metric_value}
                 try:
                     score = self.evaluator.evaluate(metric_def.logic_formula, context)
@@ -644,7 +666,7 @@ class AbstractMasterEngine:
                     )
                     score = 0.0
             else:
-                # logic_formula 없으면 operator/threshold 기반 직접 비교
+                # Fall back to direct operator/threshold comparison when no logic_formula
                 score = self._evaluate_metric_direct(metric_def, metric_value)
 
             total_score += score
@@ -653,14 +675,14 @@ class AbstractMasterEngine:
 
     @staticmethod
     def _evaluate_metric_direct(metric_def: QuantMetric, value: float) -> float:
-        """logic_formula 없을 때 operator/threshold로 직접 평가합니다.
+        """Evaluate directly via operator/threshold when no logic_formula is provided.
 
         Args:
-            metric_def: 정량 지표 정의
-            value: 실제 지표 값
+            metric_def: Quantitative metric definition
+            value: Actual metric value
 
         Returns:
-            조건 충족 시 weight, 미충족 시 0.0
+            The metric weight if the condition is met; 0.0 otherwise
         """
         op_map = {
             "<": operator.lt,
@@ -673,27 +695,28 @@ class AbstractMasterEngine:
         op_func = op_map.get(metric_def.operator)
         if op_func and op_func(value, metric_def.threshold):
             return metric_def.weight
-        # Trend, Volatility 등 특수 연산자는 threshold 기반 단순 비교
+        # Special operators (Trend, Volatility) use simple threshold comparison
         if metric_def.operator in ("Trend", "Volatility"):
             if value > metric_def.threshold:
                 return metric_def.weight
         return 0.0
 
-    # ── Step 2: 정성 평가 ──
+    # ── Step 2: Qualitative Assessment ──
 
     def _execute_step2(
         self, nlp_data: Optional[NLPContextPayload]
     ) -> Tuple[float, Optional[str]]:
-        """Step 2: 정성 평가를 실행합니다.
+        """Execute Step 2: Qualitative Assessment.
 
-        NLP 키워드 매칭 및 코사인 유사도 기반으로 시나리오 점수를 산출합니다.
-        ``CRITICAL_INHIBIT`` 액션이 발동되면 특수 플래그를 반환합니다.
+        Computes scenario scores based on NLP keyword matching and cosine
+        similarity. Returns a special flag if a ``CRITICAL_INHIBIT`` action
+        is triggered.
 
         Args:
-            nlp_data: NLP 컨텍스트 페이로드 (None이면 0.0)
+            nlp_data: NLP context payload (returns 0.0 if None)
 
         Returns:
-            (Step 2 정성 점수, 활성 특수 액션 또는 None)
+            (Step 2 qualitative score, active special action or None)
         """
         if nlp_data is None:
             return 0.0, None
@@ -712,13 +735,13 @@ class AbstractMasterEngine:
                 and scenario.score_modifier < 0
                 and self._check_keyword_match(scenario, nlp_data)
             ):
-                # 시나리오 발동
+                # Scenario triggered
                 effective_modifier = scenario.score_modifier * activation_score
                 total_score += effective_modifier
 
                 if scenario.action == "CRITICAL_INHIBIT":
                     critical_action = "CRITICAL_INHIBIT"
-                    total_score += scenario.score_modifier  # 강제 억제
+                    total_score += scenario.score_modifier  # Forced inhibition
                     logger.warning(
                         "노드 %s Step2: CRITICAL_INHIBIT 발동 — %s",
                         self.node_id, scenario.condition,
@@ -732,33 +755,33 @@ class AbstractMasterEngine:
         nlp_data: NLPContextPayload,
         confidence_threshold: float,
     ) -> float:
-        """개별 시나리오의 발동 점수를 계산합니다.
+        """Compute the activation score for an individual scenario.
 
-        우선순위:
-        1. semantic_similarity_scores에 해당 condition의 유사도가 있으면 사용
-        2. 없으면 키워드 매칭 기반 휴리스틱
+        Priority:
+        1. Use cosine similarity from semantic_similarity_scores if available
+        2. Otherwise, fall back to keyword-matching heuristic
 
         Args:
-            scenario: 정성 시나리오 정의
-            nlp_data: NLP 데이터 페이로드
-            confidence_threshold: NLP 신뢰도 하한
+            scenario: Qualitative scenario definition
+            nlp_data: NLP data payload
+            confidence_threshold: NLP confidence lower bound
 
         Returns:
-            발동 점수 (0.0 ~ 1.0, 미발동 시 0.0)
+            Activation score (0.0–1.0; 0.0 if not triggered)
         """
-        # NLP 모델 전역 신뢰도 체크
+        # Global NLP model confidence check
         if nlp_data.nlp_model_confidence < confidence_threshold:
             return 0.0
 
-        # 1) 코사인 유사도 기반 평가 (Semantic NLP 뼈대)
+        # 1) Cosine similarity-based evaluation (Semantic NLP backbone)
         similarity = nlp_data.semantic_similarity_scores.get(scenario.condition)
         if similarity is not None:
-            # 유사도가 confidence_threshold 이상이면 발동
+            # Trigger if similarity ≥ confidence_threshold
             if similarity >= confidence_threshold:
                 return similarity
             return 0.0
 
-        # 2) 키워드 매칭 기반 폴백
+        # 2) Keyword matching fallback
         if self._check_keyword_match(scenario, nlp_data):
             return 1.0
 
@@ -769,27 +792,27 @@ class AbstractMasterEngine:
         scenario: QualitativeScenario,
         nlp_data: NLPContextPayload,
     ) -> bool:
-        """키워드 매칭으로 시나리오 발동 여부를 판단합니다.
+        """Determine scenario activation via keyword matching.
 
-        detected_keywords에 시나리오 키워드가 존재하거나,
-        raw_texts에 키워드가 포함되어 있으면 발동입니다.
+        A scenario is triggered if its keywords appear in detected_keywords
+        or are contained within the raw_texts.
 
         Args:
-            scenario: 시나리오 정의
-            nlp_data: NLP 데이터
+            scenario: Scenario definition
+            nlp_data: NLP data
 
         Returns:
-            키워드 매칭 여부
+            Whether keywords matched
         """
         if not scenario.keywords:
             return False
 
-        # detected_keywords 매핑 체크
+        # Check detected_keywords mapping
         for kw in scenario.keywords:
             if kw in nlp_data.detected_keywords:
                 return True
 
-        # raw_texts 전문 검색 폴백
+        # Full-text search fallback on raw_texts
         combined_text = " ".join(nlp_data.raw_texts).lower()
         for kw in scenario.keywords:
             if kw.lower() in combined_text:
@@ -797,7 +820,7 @@ class AbstractMasterEngine:
 
         return False
 
-    # ── Step 3: 통계 보정 ──
+    # ── Step 3: Statistical Correction ──
 
     def _execute_step3(
         self,
@@ -806,19 +829,19 @@ class AbstractMasterEngine:
         current_regime: Optional[MarketRegime] = None,
         extra_context: Optional[Dict[str, Any]] = None,
     ) -> float:
-        """Step 3: 통계 보정을 실행합니다.
+        """Execute Step 3: Statistical Correction.
 
-        Step 1 + Step 2 결과를 JSON의 formula로 결합하고,
-        historical_win_rate (동적 갱신 가능), decay_factor로 보정합니다.
+        Combines Step 1 + Step 2 results using the JSON-defined formula,
+        corrected by historical_win_rate (dynamically updatable) and decay_factor.
 
         Args:
-            step1_score: Step 1 정량 점수
-            step2_score: Step 2 정성 점수
-            current_regime: 현재 시장 국면 (선택)
-            extra_context: 추가 컨텍스트 변수 (예: 다른 노드 점수)
+            step1_score: Step 1 quantitative score
+            step2_score: Step 2 qualitative score
+            current_regime: Current market regime (optional)
+            extra_context: Additional context variables (e.g., other node scores)
 
         Returns:
-            보정된 최종 점수
+            Corrected final score
         """
         step3 = self.node.Intelligence_Structure.Step_3_Statistical_Correction
         output_var_s1 = (
@@ -830,7 +853,7 @@ class AbstractMasterEngine:
             .Step_2_Qualitative_Context.output_variable
         )
 
-        # 수식 컨텍스트 구성
+        # Construct formula evaluation context
         context: Dict[str, Any] = {
             output_var_s1: step1_score,
             output_var_s2: step2_score,
@@ -838,7 +861,7 @@ class AbstractMasterEngine:
             "decay_factor": step3.decay_factor,
         }
 
-        # 국면별 성과 보정 (v8.6: N/A 및 타입 에러 방어 로직 추가)
+        # Regime-specific performance correction (v8.6: added N/A and type-error guards)
         if current_regime:
             regime_key = current_regime.value if hasattr(current_regime, 'value') else str(current_regime)
             if regime_key in step3.regime_performance:
@@ -851,7 +874,7 @@ class AbstractMasterEngine:
                 except (ValueError, TypeError):
                     pass
 
-        # 추가 컨텍스트 (다른 노드 점수 등)
+        # Additional context (e.g., scores from other nodes)
         if extra_context:
             context.update(extra_context)
 
@@ -866,31 +889,31 @@ class AbstractMasterEngine:
 
         return result
 
-    # ── 상태 플래그 결정 ──
+    # ── State flag determination ──
 
     def _determine_state_flag(self, normalized_score: float) -> Optional[str]:
-        """정규화 점수 기반으로 활성 상태 플래그를 결정합니다.
+        """Determine the active state flag based on the normalized score.
 
-        State_Flags 리스트의 인덱스를 점수 구간에 매핑합니다:
-        - 높은 점수 → 첫 번째 플래그 (긍정적)
-        - 낮은 점수 → 마지막 플래그 (경고)
+        Maps State_Flags list indices to score intervals:
+        - High score → first flag (positive)
+        - Low score → last flag (warning)
 
         Args:
-            normalized_score: 0.0 ~ 1.0 정규화 점수
+            normalized_score: Normalized score in [0.0, 1.0]
 
         Returns:
-            활성 상태 플래그 문자열 또는 None
+            Active state flag string, or None
         """
         flags = self.node.Final_Output.State_Flags
         if not flags:
             return None
         n = len(flags)
-        # 점수를 n개 구간으로 분할
+        # Partition the score into n intervals
         idx = min(int(normalized_score * n), n - 1)
-        # 높은 점수 → 첫 번째 플래그 (역순 매핑)
+        # High score → first flag (reverse mapping)
         return flags[n - 1 - idx]
 
-    # ── 통합 실행 ──
+    # ── Integrated execution ──
 
     def execute(
         self,
@@ -899,24 +922,24 @@ class AbstractMasterEngine:
         current_regime: Optional[MarketRegime] = None,
         extra_context: Optional[Dict[str, Any]] = None,
     ) -> NodeExecutionResult:
-        """3-Step 파이프라인을 통합 실행하고 정규화된 결과를 반환합니다.
+        """Execute the full 3-step pipeline and return the normalized result.
 
         Args:
-            market_data: 정량 데이터 페이로드
-            nlp_data: NLP 정성 데이터 페이로드 (선택)
-            current_regime: 현재 시장 국면 (선택)
-            extra_context: 추가 컨텍스트 변수 딕셔너리 (선택)
+            market_data: Quantitative data payload
+            nlp_data: NLP qualitative data payload (optional)
+            current_regime: Current market regime (optional)
+            extra_context: Additional context variable dictionary (optional)
 
         Returns:
-            NodeExecutionResult — 정규화 점수 포함
+            NodeExecutionResult containing the normalized score
         """
-        # Step 1: 정량 분석
+        # Step 1: Quantitative Analysis
         step1_score = self._execute_step1(market_data)
 
-        # Step 2: 정성 평가
+        # Step 2: Qualitative Assessment
         step2_score, critical_action = self._execute_step2(nlp_data)
 
-        # CRITICAL_INHIBIT 발동 시 즉시 0점
+        # Immediate zero score on CRITICAL_INHIBIT activation
         if critical_action == "CRITICAL_INHIBIT":
             logger.warning(
                 "노드 %s: CRITICAL_INHIBIT 발동 → 강제 0점 할당", self.node_id
@@ -937,15 +960,15 @@ class AbstractMasterEngine:
             self._update_state(result)
             return result
 
-        # Step 3: 통계 보정
+        # Step 3: Statistical Correction
         step3_score = self._execute_step3(
             step1_score, step2_score, current_regime, extra_context
         )
 
-        # 정규화 (0.0 ~ 1.0)
+        # Normalization (0.0–1.0)
         normalized = self.normalizer.normalize(step3_score)
 
-        # 상태 플래그 결정
+        # Determine state flag
         state_flag = self._determine_state_flag(normalized)
 
         result = NodeExecutionResult(
@@ -965,19 +988,19 @@ class AbstractMasterEngine:
         return result
 
     def _update_state(self, result: NodeExecutionResult) -> None:
-        """실행 결과로 엔진 상태를 갱신합니다.
+        """Update engine state from the execution result.
 
         Args:
-            result: 노드 실행 결과
+            result: Node execution result
         """
         self.state.last_score = result.normalized_score
         self.state.signal_history.append(result.normalized_score)
-        # 최근 100개만 유지
+        # Retain only the most recent 100 entries
         if len(self.state.signal_history) > 100:
             self.state.signal_history = self.state.signal_history[-100:]
         self.state.last_updated = datetime.utcnow()
 
-        # 시그널 지속성 갱신
+        # Update signal persistence
         if len(self.state.signal_history) >= 2:
             prev = self.state.signal_history[-2]
             curr = self.state.signal_history[-1]
@@ -988,42 +1011,44 @@ class AbstractMasterEngine:
 
 
 # ══════════════════════════════════════════════════════════
-# 4. GraphOrchestrator — 12인 거장 DAG 시그널 해소 시스템
+# 4. GraphOrchestrator — 12-Maestro DAG Signal Resolution System
 # ══════════════════════════════════════════════════════════
 
 class GraphOrchestrator:
-    """12인 투자 거장 노드를 통합 관리하는 시냅스 시스템.
+    """Synapse system that orchestrates the 12 investment maestro nodes.
 
-    핵심 기능:
-        1. **위상 정렬 (Topological Sort)** — 노드 간 의존성(엣지)을 분석하여
-           안전한 실행 순서를 보장합니다. 순환 참조 감지 시 예외 발생.
+    Core capabilities:
+        1. **Topological Sort** — Analyzes inter-node dependencies (edges)
+           to guarantee a safe execution order. Raises an exception on
+           circular dependency detection.
 
-        2. **시그널 해소 (resolve_signals)** — 4단계 위계:
-           (a) Priority Override: Taleb 블랙스완 등 치명적 리스크 → 강제 셧다운
-           (b) Global Adjustment: Dalio 등 매크로 점수 → 연속 함수로 가중치 조절
-           (c) Synergy/Suppress: 노드 간 상호작용 (멍거-버핏 등)
-           (d) Position Sizing: Thorp Kelly 기준 최종 비중 체인링
+        2. **Signal Resolution (resolve_signals)** — Four-tier hierarchy:
+           (a) Priority Override: Taleb black-swan etc. → forced shutdown on critical risk
+           (b) Global Adjustment: Dalio macro score → continuous weight adjustment
+           (c) Synergy/Suppress: Inter-node interactions (e.g., Munger–Buffett)
+           (d) Position Sizing: Thorp Kelly-based final allocation chaining
 
-        3. **연속적 가중치 조절** — Threshold 이분법 대신 Linear Interpolation /
-           Exponential Decay 등 연속 함수로 부드러운 감쇠/증폭
+        3. **Continuous Weight Adjustment** — Replaces binary threshold logic
+           with continuous functions (linear interpolation / exponential decay)
+           for smooth attenuation/amplification
 
     Args:
-        configs: MasterEngineConfig 리스트 (4개 도메인 JSON)
-        normalizer: 공유 ScoreNormalizer (기본 SigmoidNormalizer)
-        evaluator: 공유 SafeFormulaEvaluator (기본 새 인스턴스)
+        configs: List of MasterEngineConfig (four domain JSONs)
+        normalizer: Shared ScoreNormalizer (default: SigmoidNormalizer)
+        evaluator: Shared SafeFormulaEvaluator (default: new instance)
     """
 
-    # ── Priority Override 우선순위 (높을수록 우선) ──
+    # ── Priority Override precedence (higher = higher priority) ──
     _OVERRIDE_PRIORITY: Dict[str, int] = {
-        "Master_Override": 100,   # Taleb: 블랙스완, 유동성 동결
-        "Override": 80,           # Munger: 사기/회계 위험
-        "Global_Weight_Adjuster": 60,  # Dalio: 매크로 국면
-        "Suppress": 40,           # 일반 억제
-        "Synergize_With": 20,     # 시너지
+        "Master_Override": 100,   # Taleb: black swan, liquidity freeze
+        "Override": 80,           # Munger: fraud/accounting risk
+        "Global_Weight_Adjuster": 60,  # Dalio: macro regime
+        "Suppress": 40,           # General suppression
+        "Synergize_With": 20,     # Synergy
     }
 
-    # Taleb 임계값: 이 이상이면 마스터 오버라이드 발동
-    _TALEB_RUIN_THRESHOLD: float = 0.75  # 정규화 기준
+    # Taleb threshold: master override triggers above this level
+    _TALEB_RUIN_THRESHOLD: float = 0.75  # normalized basis
 
     def __init__(
         self,
@@ -1034,25 +1059,25 @@ class GraphOrchestrator:
         self._normalizer = normalizer or SigmoidNormalizer()
         self._evaluator = evaluator or SafeFormulaEvaluator()
 
-        # 노드 엔진 레지스트리: node_id → AbstractMasterEngine
+        # Node engine registry: node_id → AbstractMasterEngine
         self._engines: Dict[str, AbstractMasterEngine] = {}
-        # 논리 엣지 전체 목록
+        # Complete list of logical edges
         self._edges: List[LogicalEdge] = []
-        # 위상 정렬 결과 캐시
+        # Cached topological sort result
         self._sorted_order: Optional[List[str]] = None
 
-        # 글로벌 엔진 상태
+        # Global engine state
         self.global_state = EngineState(node_id="GLOBAL")
 
         self._load_configs(configs)
 
-    # ── 초기화 ──
+    # ── Initialization ──
 
     def _load_configs(self, configs: List[MasterEngineConfig]) -> None:
-        """MasterEngineConfig 리스트로부터 엔진과 엣지를 로드합니다.
+        """Load engines and edges from MasterEngineConfig list.
 
         Args:
-            configs: 4개 도메인의 MasterEngineConfig
+            configs: MasterEngineConfig instances for four domains
         """
         for config in configs:
             for node in config.Nodes:
@@ -1069,29 +1094,29 @@ class GraphOrchestrator:
 
             self._edges.extend(config.Logical_Edges)
 
-        # 위상 정렬 수행
+        # Perform topological sort
         self._sorted_order = self._topological_sort()
         logger.info("위상 정렬 완료: %s", self._sorted_order)
 
-    # ── 위상 정렬 (DAG) ──
+    # ── Topological Sort (DAG) ──
 
     def _topological_sort(self) -> List[str]:
-        """노드 간 의존성을 분석하여 위상 정렬을 수행합니다.
+        """Perform topological sort by analyzing inter-node dependencies.
 
-        엣지의 Source → Target 방향으로 의존성 그래프를 구성하고,
-        Kahn 알고리즘으로 안전한 실행 순서를 보장합니다.
+        Builds a dependency graph from Source → Target edge directions
+        and guarantees a safe execution order via Kahn's algorithm.
 
-        와일드카드 타겟(ALL_*)은 등록된 모든 노드로 확장합니다.
+        Wildcard targets (ALL_*) are expanded to all registered nodes.
 
         Returns:
-            노드 ID 실행 순서 리스트
+            List of node IDs in execution order
 
         Raises:
-            ValueError: 순환 참조 감지 시
+            ValueError: When a circular dependency is detected
         """
         all_node_ids = set(self._engines.keys())
 
-        # 인접 리스트 및 진입 차수 구성
+        # Build adjacency list and in-degree map
         adjacency: Dict[str, Set[str]] = defaultdict(set)
         in_degree: Dict[str, int] = {nid: 0 for nid in all_node_ids}
 
@@ -1100,17 +1125,17 @@ class GraphOrchestrator:
             if source not in all_node_ids:
                 continue
 
-            # 타겟 확장 (와일드카드 처리)
+            # Expand targets (wildcard handling)
             targets = self._resolve_targets(edge.Target, all_node_ids, source)
 
             for target in targets:
                 if target in all_node_ids and target != source:
-                    # Source가 먼저 실행되어야 Target에 영향을 줄 수 있음
+                    # Source must execute before Target to influence it
                     if target not in adjacency[source]:
                         adjacency[source].add(target)
                         in_degree[target] += 1
 
-        # Kahn 알고리즘
+        # Kahn's algorithm
         queue: deque[str] = deque(
             nid for nid in all_node_ids if in_degree[nid] == 0
         )
@@ -1136,15 +1161,15 @@ class GraphOrchestrator:
     def _resolve_targets(
         target: str, all_node_ids: Set[str], source: str
     ) -> List[str]:
-        """와일드카드 타겟을 실제 노드 ID 리스트로 확장합니다.
+        """Expand wildcard targets into a list of actual node IDs.
 
         Args:
-            target: 타겟 문자열 (노드 ID 또는 'ALL_*')
-            all_node_ids: 등록된 모든 노드 ID 집합
-            source: 소스 노드 ID (자기 참조 방지)
+            target: Target string (node ID or 'ALL_*')
+            all_node_ids: Set of all registered node IDs
+            source: Source node ID (to prevent self-reference)
 
         Returns:
-            타겟 노드 ID 리스트
+            List of target node IDs
         """
         if target.startswith("ALL_"):
             if target == "ALL_OTHER_ENGINES":
@@ -1155,11 +1180,11 @@ class GraphOrchestrator:
                     if nid.startswith("GRO_") or nid.startswith("VAL_")
                 ]
             else:
-                # 기타 ALL_ 패턴: 소스 제외 전체
+                # Other ALL_ patterns: all nodes except source
                 return [nid for nid in all_node_ids if nid != source]
         return [target]
 
-    # ── 공개 API: 시그널 해소 ──
+    # ── Public API: Signal Resolution ──
 
     def resolve_signals(
         self,
@@ -1167,20 +1192,20 @@ class GraphOrchestrator:
         nlp_data: Optional[NLPContextPayload] = None,
         extra_context: Optional[Dict[str, Any]] = None,
     ) -> OrchestratorOutput:
-        """12인 거장 시그널을 통합 해소하고 최종 포지션을 산출합니다.
+        """Resolve the 12-maestro signals and compute the final position.
 
-        실행 위계:
-            1. Priority Override — 치명적 시스템 리스크 감지 시 강제 셧다운
-            2. Global Adjustment — 매크로 국면 기반 연속 가중치 조절
-            3. Synergy/Suppress — 노드 간 상호작용 반영
-            4. Position Sizing — Thorp Kelly 기준 최종 비중
+        Execution hierarchy:
+            1. Priority Override — Forced shutdown on critical systemic risk
+            2. Global Adjustment — Continuous weight adjustment based on macro regime
+            3. Synergy/Suppress — Reflect inter-node interactions
+            4. Position Sizing — Final allocation via Thorp Kelly criterion
 
         Args:
-            market_data: 정량 데이터 페이로드
-            nlp_data: NLP 정성 데이터 (선택)
+            market_data: Quantitative data payload
+            nlp_data: NLP qualitative data (optional)
 
         Returns:
-            OrchestratorOutput — 노드별 결과, 앙상블 시그널, 최종 포지션
+            OrchestratorOutput — per-node results, ensemble signal, final position
         """
         if self._sorted_order is None:
             self._sorted_order = self._topological_sort()
@@ -1189,13 +1214,13 @@ class GraphOrchestrator:
         audit_log: List[str] = []
         node_results: Dict[str, NodeExecutionResult] = {}
 
-        # ── Phase 0: 위상 정렬 순서대로 노드 실행 ──
+        # ── Phase 0: Execute nodes in topological order ──
         audit_log.append(f"[Phase 0] 위상 정렬 순서: {self._sorted_order}")
 
         for node_id in self._sorted_order:
             engine = self._engines[node_id]
 
-            # 다른 노드 점수를 extra_context로 전달
+            # Pass other node scores as extra_context
             node_context: Dict[str, Any] = {}
             if extra_context:
                 node_context.update(extra_context)
@@ -1232,8 +1257,8 @@ class GraphOrchestrator:
         
         audit_log.append(f"[Phase 0.5] Raw Philosophy Tension Score: {raw_tension:.4f}")
 
-        # ── Phase 1: Priority Override / Master Influence — 리스크 감쇄 및 조정 ──
-        # [v8.8] Soft-Shutdown: 하드 셧다운 대신 지수적 감쇄 적용
+        # ── Phase 1: Priority Override / Master Influence — risk attenuation & adjustment ──
+        # [v8.8] Soft-Shutdown: exponential decay instead of hard shutdown
         # [v8.9.8] Variant Support: skip Phase 1 override entirely for controlled experiments
         skip_override = bool(extra_context.get("_variant_no_override", False)) if extra_context else False
 
@@ -1282,7 +1307,7 @@ class GraphOrchestrator:
                     f"[Phase 1] Extreme Risk Discount applied (Factor={influence_factor:.4f}) - Non-zero floor retained for deliberation."
                 )
         elif influence_active:
-            # Soft-Shutdown: 모든 노드 점수를 지수적으로 감쇄
+            # Soft-Shutdown: exponentially attenuate all node scores
             for nid in node_results:
                 if nid != influence_source:
                     new_val = node_results[nid].normalized_score * influence_factor
@@ -1293,17 +1318,17 @@ class GraphOrchestrator:
                 f"[Phase 1] Soft-Shutdown 적용 (Source={influence_source}, Factor={influence_factor:.4f})"
             )
 
-        # ── Phase 2: Global Adjustment — 매크로 연속 가중치 조절 ──
+        # ── Phase 2: Global Adjustment — macro continuous weight adjustment ──
         adjusted_scores = self._apply_global_adjustments(
             node_results, current_regime, audit_log
         )
 
-        # ── Phase 3: Synergy/Suppress — 노드 간 상호작용 ──
+        # ── Phase 3: Synergy/Suppress — inter-node interactions ──
         synergized_scores = self._apply_synergy_suppress(
             adjusted_scores, node_results, current_regime, audit_log
         )
 
-        # ── Phase 4: 앙상블 & Position Sizing ──
+        # ── Phase 4: Ensemble & Position Sizing ──
         ensemble_signal, final_position = self._compute_ensemble_and_sizing(
             synergized_scores, node_results, audit_log
         )
@@ -1325,18 +1350,19 @@ class GraphOrchestrator:
             if spg_veto:
                 ensemble_signal = 0.0
                 final_position = 0.0
+                # SPG VETO triggered → final signal and position set to 0.0
                 audit_log.append("[Phase 5] SPG VETO 발동 → 최종 시그널 및 비중 0.0 처리")
             elif spg_report.get("apply_floor"):
                 floor_val = spg_report.get("strategic_floor", 0.0)
                 ensemble_signal = max(ensemble_signal, floor_val)
                 audit_log.append(f"[Phase 5] SPG Floor 적용 → Ensemble Signal {ensemble_signal:.4f}")
 
-        # Shannon 신뢰도
+        # Shannon confidence
         shannon_confidence = 1.0
         if "RSK_SHANNON_001" in node_results:
             shannon_confidence = node_results["RSK_SHANNON_001"].normalized_score
 
-        # 글로벌 상태 갱신
+        # Update global state
         self.global_state.last_score = ensemble_signal
         self.global_state.previous_regime = current_regime
         self.global_state.last_updated = datetime.utcnow()
@@ -1366,45 +1392,45 @@ class GraphOrchestrator:
         audit_log: List[str],
         override_k: Optional[float] = None,
     ) -> Tuple[bool, Optional[str], float]:
-        """Master/Priority influence를 지수적 감쇄 함수로 처리합니다.
+        """Process Master/Priority influence via an exponential decay function.
 
-        하드코딩된 이분법적 셧다운 대신, 리스크 점수에 비례하여
-        다른 노드들의 시그널을 지수적으로 감쇄(Exponential Decay)시킵니다.
+        Instead of a hard-coded binary shutdown, this attenuates other nodes'
+        signals exponentially in proportion to the risk score.
 
-        수식: factor = exp(-k * Ruin_Risk)
-        - k=3.0 적용 시: Risk 0.5 -> factor 0.22, Risk 0.8 -> factor 0.09, Risk 1.0 -> factor 0.05
+        Formula: factor = exp(-k * Ruin_Risk)
+        - With k=3.0: Risk 0.5 → factor 0.22, Risk 0.8 → factor 0.09, Risk 1.0 → factor 0.05
 
         Args:
             override_k: If provided, use this as the decay coefficient instead of default 3.5.
 
         Returns:
-            (영향 활성 여부, 소스 노드 ID, 감쇄 인자)
+            (influence active flag, source node ID, decay factor)
         """
         k = override_k if override_k is not None else 3.5
         audit_log.append(f"[Phase 1] Master Influence (Soft-Shutdown) 평가 시작 (k={k})")
 
-        # Taleb 직접 검사
+        # Direct Taleb check
         taleb_result = results.get("RSK_TALEB_001")
         if taleb_result:
             risk_score = taleb_result.normalized_score
             influence_factor = math.exp(-k * risk_score)
             
-            if risk_score > 0.4: # 어느 정도 위험이 감지될 때부터 로그에 남김
+            if risk_score > 0.4: # Log when a significant risk level is detected
                 audit_log.append(
                     f"  ⚠ Taleb Master Influence: Risk={risk_score:.4f} → "
                     f"Decay Factor={influence_factor:.4f}"
                 )
             
-            # 위험이 매우 높으면(예: 1.2 이상) 실질적 셧다운으로 간주
+            # Treat as effective shutdown when risk is extremely high (e.g., > 1.2)
             if risk_score > 1.5:
                 return True, "RSK_TALEB_001", 0.0
                 
-            if risk_score > 0.1: # 유의미한 위험 존재 시
+            if risk_score > 0.1: # Meaningful risk present
                 return True, "RSK_TALEB_001", influence_factor
 
         return False, None, 1.0
 
-    # ── Phase 2: Global Adjustment (연속 함수) ──
+    # ── Phase 2: Global Adjustment (continuous function) ──
 
     def _apply_global_adjustments(
         self,
@@ -1412,22 +1438,22 @@ class GraphOrchestrator:
         regime: Optional[MarketRegime],
         audit_log: List[str],
     ) -> Dict[str, float]:
-        """매크로 노드 점수를 기반으로 전역 가중치를 연속 함수로 조절합니다.
+        """Adjust global weights as a continuous function of macro node scores.
 
-        하드코딩된 ``if > 0.8`` 이분법 대신, 점수에 비례하여
-        가중치가 부드럽게 감쇠/증폭되는 연속 함수를 사용합니다.
+        Instead of hard-coded ``if > 0.8`` binary logic, weights are smoothly
+        attenuated/amplified as a continuous function of the score.
 
-        적용 함수:
+        Applied functions:
             - growth_multiplier = linear_interp(dalio_score, [0.3, 0.8], [1.0, 0.5])
             - value_multiplier  = linear_interp(dalio_score, [0.3, 0.8], [1.0, 1.5])
 
         Args:
-            results: 노드별 실행 결과
-            regime: 현재 시장 국면
-            audit_log: 감사 로그
+            results: Per-node execution results
+            regime: Current market regime
+            audit_log: Audit log
 
         Returns:
-            노드 ID → 조정된 점수 딕셔너리
+            Dictionary of node ID → adjusted score
         """
         audit_log.append("[Phase 2] Global Adjustment (연속 가중치) 적용 시작")
         adjusted: Dict[str, float] = {
@@ -1442,7 +1468,7 @@ class GraphOrchestrator:
             if source_result is None:
                 continue
 
-            # 국면 조건 체크
+            # Regime condition check
             if edge.Condition_Regime and regime:
                 if regime not in edge.Condition_Regime:
                     continue
@@ -1458,7 +1484,7 @@ class GraphOrchestrator:
 
                 original = adjusted[target_id]
 
-                # 연속 가중치 함수 적용
+                # Apply continuous weight function
                 multiplier = self._continuous_weight_function(
                     source_score, target_id, edge
                 )
@@ -1475,25 +1501,25 @@ class GraphOrchestrator:
     def _continuous_weight_function(
         self, source_score: float, target_id: str, edge: LogicalEdge
     ) -> float:
-        """소스 점수를 기반으로 연속적 가중치 승수를 계산합니다.
+        """Compute a continuous weight multiplier based on the source score.
 
-        이분법적 ``if > threshold`` 대신 Linear Interpolation으로
-        부드러운 감쇠/증폭을 구현합니다.
+        Uses linear interpolation instead of binary ``if > threshold``
+        for smooth attenuation/amplification.
 
-        성장(Growth) 노드 → 높은 매크로 리스크일수록 감쇠
-        가치(Value) 노드 → 높은 매크로 리스크일수록 증폭
+        Growth nodes → attenuated as macro risk increases
+        Value nodes → amplified as macro risk increases
 
         Args:
-            source_score: 소스 노드 정규화 점수 (0~1)
-            target_id: 타겟 노드 ID
-            edge: 논리 엣지
+            source_score: Source node normalized score (0–1)
+            target_id: Target node ID
+            edge: Logical edge
 
         Returns:
-            가중치 승수 (0.3 ~ 2.0)
+            Weight multiplier (0.3–2.0)
         """
-        # 타겟이 성장 노드인지 가치 노드인지 판별
+        # Determine whether the target is a growth or value node
         if target_id.startswith("GRO_"):
-            # Growth: Dalio 리스크 높을수록 감쇠
+            # Growth: attenuated as Dalio risk increases
             # source_score 0.0→1.0, multiplier 1.0→0.3
             return self._linear_interpolation(
                 source_score,
@@ -1504,14 +1530,14 @@ class GraphOrchestrator:
             self._engines.get(target_id, None) and
             self._engines[target_id].node.Master or ""
         ):
-            # Graham Value: Dalio 리스크 높을수록 증폭 (역발상 기회)
+            # Graham Value: amplified as Dalio risk increases (contrarian opportunity)
             return self._linear_interpolation(
                 source_score,
                 x_range=(0.2, 0.9),
                 y_range=(1.0, 1.8),
             )
         else:
-            # 기타 노드: 약한 감쇠
+            # Other nodes: mild attenuation
             return self._exponential_decay(source_score, decay_rate=0.5)
 
     @staticmethod
@@ -1520,17 +1546,17 @@ class GraphOrchestrator:
         x_range: Tuple[float, float] = (0.0, 1.0),
         y_range: Tuple[float, float] = (1.0, 0.5),
     ) -> float:
-        """선형 보간으로 연속 가중치를 계산합니다.
+        """Compute a continuous weight via linear interpolation.
 
-        x가 x_range 범위 밖이면 클리핑합니다.
+        Clips when x is outside x_range.
 
         Args:
-            x: 입력값 (0~1)
-            x_range: (x_min, x_max) 보간 범위
-            y_range: (y_at_x_min, y_at_x_max) 출력 범위
+            x: Input value (0–1)
+            x_range: (x_min, x_max) interpolation domain
+            y_range: (y_at_x_min, y_at_x_max) output range
 
         Returns:
-            보간된 가중치
+            Interpolated weight
         """
         x_min, x_max = x_range
         y_min, y_max = y_range
@@ -1547,17 +1573,17 @@ class GraphOrchestrator:
     def _exponential_decay(
         x: float, decay_rate: float = 0.5, base: float = 1.0
     ) -> float:
-        """지수 감쇠로 연속 가중치를 계산합니다.
+        """Compute a continuous weight via exponential decay.
 
-        수식: base * exp(-decay_rate * x)
+        Formula: base * exp(-decay_rate * x)
 
         Args:
-            x: 입력값 (0~1)
-            decay_rate: 감쇠율
-            base: 기저값
+            x: Input value (0–1)
+            decay_rate: Decay rate
+            base: Base value
 
         Returns:
-            감쇠된 가중치 (> 0)
+            Decayed weight (> 0)
         """
         return base * math.exp(-decay_rate * x)
 
@@ -1570,27 +1596,27 @@ class GraphOrchestrator:
         regime: Optional[MarketRegime],
         audit_log: List[str],
     ) -> Dict[str, float]:
-        """노드 간 시너지/억제 상호작용을 반영합니다.
+        """Apply inter-node synergy/suppress interactions.
 
-        엣지의 Relationship_Type에 따라:
-        - Synergize_With: 소스 + 타겟 모두 높을 때 증폭
-        - Suppress: 소스가 높을 때 타겟 감쇠
+        Based on the edge Relationship_Type:
+        - Synergize_With: Amplify when both source and target are high
+        - Suppress: Attenuate target when source is high
 
-        모든 상호작용은 연속 함수로 처리합니다.
+        All interactions are processed via continuous functions.
 
         Args:
-            adjusted_scores: Phase 2 이후 조정된 점수
-            results: 원본 노드 결과 (상태 플래그 참조용)
-            regime: 현재 시장 국면
-            audit_log: 감사 로그
+            adjusted_scores: Post-Phase 2 adjusted scores
+            results: Original node results (for state flag reference)
+            regime: Current market regime
+            audit_log: Audit log
 
         Returns:
-            시너지/억제 반영된 최종 점수 딕셔너리
+            Final score dictionary with synergy/suppress applied
         """
         audit_log.append("[Phase 3] Synergy/Suppress 상호작용 적용 시작")
         final_scores = dict(adjusted_scores)
 
-        # 우선순위 기반 정렬 (높은 우선순위 먼저)
+        # Sort by priority (higher priority first)
         interaction_edges = [
             e for e in self._edges
             if e.Relationship_Type in (
@@ -1610,7 +1636,7 @@ class GraphOrchestrator:
             if source_score is None:
                 continue
 
-            # 국면 조건 체크
+            # Regime condition check
             if edge.Condition_Regime and regime:
                 if regime not in edge.Condition_Regime:
                     continue
@@ -1626,7 +1652,7 @@ class GraphOrchestrator:
                 target_score = final_scores[target_id]
 
                 if edge.Relationship_Type == RelationshipType.SYNERGIZE_WITH:
-                    # 시너지: 소스 × 타겟의 기하평균에 비례하여 증폭
+                    # Synergy: amplify proportionally to the geometric mean of source × target
                     synergy_factor = self._compute_synergy_multiplier(
                         source_score, target_score
                     )
@@ -1639,7 +1665,7 @@ class GraphOrchestrator:
                     )
 
                 elif edge.Relationship_Type == RelationshipType.SUPPRESS:
-                    # 억제: 소스 점수에 비례하여 타겟 감쇠
+                    # Suppress: attenuate target proportionally to source score
                     suppress_factor = self._compute_suppress_multiplier(
                         source_score, results.get(edge.Source)
                     )
@@ -1652,7 +1678,7 @@ class GraphOrchestrator:
                     )
 
                 elif edge.Relationship_Type in (RelationshipType.CONTINUOUS_DISCOUNT, RelationshipType.CONTINUOUS_SYNERGY):
-                    # 연속적 가중치 전이: 소스 점수가 타겟에 직접 비례/반비례 영향
+                    # Continuous weight transfer: source score directly influences target proportionally/inversely
                     if edge.Relationship_Type == RelationshipType.CONTINUOUS_DISCOUNT:
                         # [Calibration] Sharper suppression: 0.05 -> 0.02
                         multiplier = source_score + 0.02
@@ -1673,19 +1699,19 @@ class GraphOrchestrator:
     def _compute_synergy_multiplier(
         source_score: float, target_score: float
     ) -> float:
-        """시너지 승수를 계산합니다.
+        """Compute the synergy multiplier.
 
-        두 노드 모두 높은 점수일 때 기하평균에 비례하여 증폭합니다.
-        최대 1.5배까지 증폭 가능합니다.
+        Amplifies proportionally to the geometric mean when both nodes score
+        high. Maximum amplification is capped at 1.5x.
 
-        수식: 1.0 + 0.5 * sqrt(source * target)
+        Formula: 1.0 + 0.5 * sqrt(source * target)
 
         Args:
-            source_score: 소스 노드 점수
-            target_score: 타겟 노드 점수
+            source_score: Source node score
+            target_score: Target node score
 
         Returns:
-            시너지 승수 (1.0 ~ 1.5)
+            Synergy multiplier (1.0–1.5)
         """
         geometric_mean = math.sqrt(max(0.0, source_score * target_score))
         # [v8.6] Synergy Boost Coefficient: 0.8 -> 0.95
@@ -1696,25 +1722,25 @@ class GraphOrchestrator:
         source_score: float,
         source_result: Optional[NodeExecutionResult] = None,
     ) -> float:
-        """억제 승수를 계산합니다.
+        """Compute the suppress multiplier.
 
-        소스의 점수가 높을수록 타겟을 강하게 감쇠합니다.
-        CRITICAL_INHIBIT 플래그가 있으면 완전 억제(0.0)합니다.
+        Higher source scores attenuate the target more strongly.
+        A CRITICAL_INHIBIT flag triggers full suppression (0.0).
 
-        수식: max(0.0, 1.0 - source_score)
+        Formula: max(0.0, 1.0 - source_score)
 
         Args:
-            source_score: 소스 노드 점수
-            source_result: 소스 노드 실행 결과 (상태 플래그 참조)
+            source_score: Source node score
+            source_result: Source node execution result (for state flag reference)
 
         Returns:
-            억제 승수 (0.0 ~ 1.0)
+            Suppress multiplier (0.0–1.0)
         """
-        # CRITICAL_INHIBIT → 완전 억제
+        # CRITICAL_INHIBIT → full suppression
         if source_result and source_result.active_state_flag == "CRITICAL_INHIBIT":
             return 0.0
 
-        # 연속 감쇠: 소스 점수 비례
+        # Continuous attenuation proportional to source score
         return max(0.0, 1.0 - source_score)
 
     # ── Phase 4: Ensemble & Position Sizing Pipeline ──
@@ -1725,51 +1751,53 @@ class GraphOrchestrator:
         results: Dict[str, NodeExecutionResult],
         audit_log: List[str],
     ) -> Tuple[float, float]:
-        """앙상블 시그널과 최종 포지션 사이즈를 산출합니다.
+        """Compute the ensemble signal and final position size.
 
-        앙상블:
-            - Value, Growth, Macro 도메인 노드의 가중 평균
-            - Thorp/Taleb/Shannon은 앙상블 대상에서 제외
+        Ensemble:
+            - Weighted average of Value, Growth, and Macro domain nodes
+            - Thorp/Taleb/Shannon are excluded from the ensemble
 
         Position Sizing (Kelly Criterion):
-            - 앙상블 시그널 × Shannon 신뢰도 → Thorp Kelly Fraction
-            - Half-Kelly 방식으로 보수적 비중 산출
+            - Ensemble signal × Shannon confidence → Thorp Kelly Fraction
+            - Conservative allocation via Half-Kelly
 
         Args:
-            final_scores: Phase 3 이후 최종 점수
-            results: 노드 실행 결과
-            audit_log: 감사 로그
+            final_scores: Post-Phase 3 final scores
+            results: Node execution results
+            audit_log: Audit log
 
         Returns:
-            (앙상블 시그널, 최종 포지션 사이즈)
+            (ensemble signal, final position size)
         """
         audit_log.append("[Phase 4] 앙상블 & Position Sizing 파이프라인 시작")
 
-        # ── 앙상블 (Risk 도메인 제외) ──
+        # ── Ensemble (excluding Risk domain) ──
         ensemble_nodes = {
             nid: score for nid, score in final_scores.items()
             if not nid.startswith("RSK_")
         }
 
         if not ensemble_nodes:
+            # No nodes eligible for ensemble → 0.0
             audit_log.append("  앙상블 대상 노드 없음 → 0.0")
             return 0.0, 0.0
 
-        # [v8.6.2] Collective Intelligence: 전문가 확신도 기반 대칭 가중 앙상블
+        # [v8.6.2] Collective Intelligence: symmetric conviction-weighted ensemble
         # Calibration: Neutral Point shifted to 0.55 (A2_BALANCED Target)
         NEUTRAL_POINT = 0.55
         weighted_sum = 0.0
         total_confidence = 0.0
         
         for nid, score in ensemble_nodes.items():
-            # [Refinement] 대칭 가중치: 하방 Expert(0.075)와 상방 Expert(0.925)가 
-            # 중립점(0.18) 대비 동일한 발언권(Weight)을 갖도록 보정
+            # [Refinement] Symmetric weighting: ensures that a bearish expert (0.075)
+            # and a bullish expert (0.925) have equal voice (weight) relative
+            # to the neutral point (0.18)
             dist = abs(score - NEUTRAL_POINT)
             if score >= NEUTRAL_POINT:
-                # 상방 가중치 스케일링 (0.18 ~ 1.0)
+                # Upside weight scaling (0.18–1.0)
                 relative_dist = dist / (1.0 - NEUTRAL_POINT + 1e-8)
             else:
-                # 하방 가중치 스케일링 (0.0 ~ 0.18)
+                # Downside weight scaling (0.0–0.18)
                 relative_dist = dist / (NEUTRAL_POINT + 1e-8)
                 
             # [Calibration] Exponent 2.8 + floor 0.05 for balanced transition
@@ -1785,7 +1813,7 @@ class GraphOrchestrator:
             f"(대상 {len(ensemble_nodes)}개 노드)"
         )
 
-        # ── Shannon 신뢰도 필터 ──
+        # ── Shannon Confidence Filter ──
         shannon_factor = 1.0
         shannon_result = results.get("RSK_SHANNON_001")
         if shannon_result:
@@ -1806,26 +1834,26 @@ class GraphOrchestrator:
         results: Dict[str, NodeExecutionResult],
         audit_log: List[str],
     ) -> float:
-        """Kelly Criterion 기반 최종 포지션 비중을 산출합니다.
+        """Compute the final position size based on the Kelly Criterion.
 
-        수식: f* = (bp - q) / b
-        - b: 손익비 (win/loss ratio)
-        - p: 승률 (앙상블 시그널 기반)
-        - q: 패율 (1 - p)
+        Formula: f* = (bp - q) / b
+        - b: Win/loss ratio
+        - p: Win rate (ensemble signal-based)
+        - q: Loss rate (1 - p)
 
-        Half-Kelly 적용으로 보수적 비중을 산출합니다.
-        Shannon 신뢰도를 직접 승수로 적용합니다.
+        Applies Half-Kelly for conservative allocation.
+        Shannon confidence is applied as a direct multiplier.
 
         Args:
-            ensemble_signal: 앙상블 시그널 (0~1)
-            shannon_factor: Shannon 신뢰도 (0.1~1.0)
-            results: 노드 실행 결과
-            audit_log: 감사 로그
+            ensemble_signal: Ensemble signal (0–1)
+            shannon_factor: Shannon confidence (0.1–1.0)
+            results: Node execution results
+            audit_log: Audit log
 
         Returns:
-            최종 포지션 비중 (0.0 ~ 1.0)
+            Final position size (0.0–1.0)
         """
-        # Thorp 노드 결과에서 Edge Conviction Premium 반영
+        # Incorporate Edge Conviction Premium from Thorp node result
         thorp_result = results.get("RSK_THORP_001")
         edge_premium = 0.0
         if thorp_result:
@@ -1834,11 +1862,11 @@ class GraphOrchestrator:
                 f"  Thorp Edge Conviction Premium = {edge_premium:.4f}"
             )
 
-        # 승률 추정: 앙상블 시그널을 기반으로
+        # Win rate estimate based on ensemble signal
         estimated_win_rate = max(0.01, min(0.99, ensemble_signal))
         estimated_loss_rate = 1.0 - estimated_win_rate
 
-        # 손익비 (기본 1.5:1, edge_premium으로 조정)
+        # Win/loss ratio (default 1.5:1, adjusted by edge_premium)
         win_loss_ratio = 1.5 * (1.0 + max(0.0, edge_premium))
 
         # Kelly Fraction: f* = (bp - q) / b
@@ -1847,13 +1875,13 @@ class GraphOrchestrator:
             / win_loss_ratio
         )
 
-        # Half-Kelly (보수적)
+        # Half-Kelly (conservative)
         half_kelly = max(0.0, kelly_fraction * 0.5)
 
-        # Shannon 신뢰도 적용
+        # Apply Shannon confidence
         final_size = half_kelly * shannon_factor
 
-        # 상한 제한 (최대 100%)
+        # Cap at maximum 100%
         final_size = max(0.0, min(1.0, final_size))
 
         audit_log.append(
@@ -1864,33 +1892,33 @@ class GraphOrchestrator:
 
         return final_size
 
-    # ── 유틸리티 ──
+    # ── Utilities ──
 
     def get_engine(self, node_id: str) -> Optional[AbstractMasterEngine]:
-        """노드 ID로 엔진 인스턴스를 검색합니다.
+        """Retrieve an engine instance by node ID.
 
         Args:
-            node_id: 노드 식별자
+            node_id: Node identifier
 
         Returns:
-            AbstractMasterEngine 인스턴스 또는 None
+            AbstractMasterEngine instance, or None
         """
         return self._engines.get(node_id)
 
     def update_node_win_rate(
         self, node_id: str, performance: PerformanceState
     ) -> float:
-        """특정 노드의 롤링 승률을 외부 성과 데이터로 갱신합니다.
+        """Update the rolling win rate of a specific node from external performance data.
 
         Args:
-            node_id: 대상 노드 ID
-            performance: 성과 데이터
+            node_id: Target node ID
+            performance: Performance data
 
         Returns:
-            갱신된 승률
+            Updated win rate
 
         Raises:
-            KeyError: 노드 ID가 존재하지 않을 때
+            KeyError: When the node ID does not exist
         """
         engine = self._engines.get(node_id)
         if engine is None:
@@ -1899,24 +1927,25 @@ class GraphOrchestrator:
 
     @property
     def registered_nodes(self) -> List[str]:
-        """등록된 모든 노드 ID 목록."""
+        """List of all registered node IDs."""
         return list(self._engines.keys())
 
     @property
     def execution_order(self) -> List[str]:
-        """위상 정렬된 실행 순서."""
+        """Topologically sorted execution order."""
         return list(self._sorted_order) if self._sorted_order else []
 
 
 # ══════════════════════════════════════════════════════════
-# 5. Strategic Policy Governor (SPG) — 시스템 2 가드레일
+# 5. Strategic Policy Governor (SPG) — System-2 Guardrail
 # ══════════════════════════════════════════════════════════
 
 class StrategicPolicyGovernor:
-    """전략적 제어 및 거부권(Veto)을 행사하는 결정론적 가드레일 엔진.
-    
-    에이전트나 엔진의 '확신(Conviction)'과 별개로, 기본적 재무 건전성 및 
-    상업적 상식에 근거하여 'Toxic' 주식을 필터링합니다.
+    """Deterministic guardrail engine that exercises strategic control and veto power.
+
+    Independent of any agent or engine 'conviction', this governor filters
+    'toxic' stocks based on fundamental financial soundness and commercial
+    common sense.
     """
     
     def evaluate(
@@ -1925,15 +1954,15 @@ class StrategicPolicyGovernor:
         ensemble_signal: float, 
         audit_log: List[str]
     ) -> Tuple[bool, Dict[str, Any]]:
-        """앙상블 시그널에 대해 최종 거부권을 행사합니다.
+        """Exercise final veto power over the ensemble signal.
         
         Args:
-            market_data: 재무 지표를 포함한 페이로드 (Debt, FCF, P/E 등)
-            ensemble_signal: 엔진이 산출한 1차 시그널
-            audit_log: 시스템 감사 로그
+            market_data: Payload containing financial metrics (Debt, FCF, P/E, etc.)
+            ensemble_signal: Primary signal produced by the engine
+            audit_log: System audit log
             
         Returns:
-            (Veto 여부, 상세 판정 리포트)
+            (Veto flag, detailed adjudication report)
         """
         audit_log.append("[Phase 5] Strategic Policy Governor (SPG) 판정 시작")
         
@@ -1945,49 +1974,48 @@ class StrategicPolicyGovernor:
             "status": "PASS"
         }
         
-        # 1. Debt Safety (부채 건전성)
+        # 1. Debt Safety
         debt_to_equity = metrics.get("Debt_to_Equity", metrics.get("Debt/Equity", 0.0))
         debt_pass = debt_to_equity < 1.5
         report["checks"]["debt_safety"] = {"value": debt_to_equity, "pass": debt_pass}
         
-        # 2. Cash Flow Health (현금흐름)
+        # 2. Cash Flow Health
         fcf_yield = metrics.get("FCF_Yield", 0.0)
-        cash_pass = fcf_yield > 0.01  # 최소 1% 이상의 FCF 수익률
+        cash_pass = fcf_yield > 0.01  # Minimum 1% FCF yield
         report["checks"]["cash_flow"] = {"fcf": fcf_yield, "pass": cash_pass}
         
-        # 3. Valuation Sanity (밸류에이션 상한)
+        # 3. Valuation Sanity
         pe_ratio = metrics.get("P/E_Ratio", 15.0)
         pe_pass = 0 < pe_ratio < 60
         report["checks"]["valuation"] = {"value": pe_ratio, "pass": pe_pass}
         
-        # 4. Profitability (수익성)
+        # 4. Profitability
         roic = metrics.get("ROIC_10yr_Avg", 0.0)
-        roic_pass = roic > 0.08  # 최소 8% 이상의 ROIC
+        roic_pass = roic > 0.08  # Minimum 8% ROIC
         report["checks"]["profitability"] = {"value": roic, "pass": roic_pass}
         
-        # 5. Asset Quality (자산 가치)
+        # 5. Asset Quality
         ncav_ratio = metrics.get("Price_to_NCAV", 1.0)
-        ncav_pass = ncav_ratio < 15.0  # 극단적 거품 방지
+        ncav_pass = ncav_ratio < 15.0  # Guard against extreme bubbles
         report["checks"]["asset_quality"] = {"value": ncav_ratio, "pass": ncav_pass}
         
-        # 최종 점수 산출
+        # Compute final score
         report["score"] = sum(1 for c in report["checks"].values() if c["pass"])
         
-        # [NEW] Strategic Floor Logic: 우량주 비중 하방 방어
+        # [NEW] Strategic Floor Logic: downside protection for quality stocks
         # adj_floor = (strategy_base + contrarian_bonus) * regime_mult * quality_mult
         score = report["score"]
         strategy_base = 0.05
-        # pe_ratio is already defined at line 1937
         contrarian_bonus = 0.02 if (pe_ratio < 10 and pe_ratio > 0) else 0.0
         quality_mult = 1.0 + (score / 5.0)  # 1.0 ~ 2.0
         
-        # 국면 보정 (예시: 하락장에서는 우량주 비중 확대)
+        # Regime correction (e.g., increase quality allocation in bear markets)
         regime_mult = 1.2 if market_data.current_regime == MarketRegime.BEAR_MARKET else 1.0
         
         strategic_floor = (strategy_base + contrarian_bonus) * regime_mult * quality_mult
         report["strategic_floor"] = strategic_floor
         
-        # 거부권 행사 (Veto Logic)
+        # Veto Logic
         is_veto = False
         if ensemble_signal > 0.6 and score < 3:
             is_veto = True
@@ -1998,7 +2026,7 @@ class StrategicPolicyGovernor:
             report["status"] = "VETO_BY_HIGH_HYPE_RISK"
             audit_log.append(f"  ⚠ SPG VETO: Extreme Hype({ensemble_signal:.3f}) 대비 재무 점수({score}/5) 부족")
         else:
-            # Veto가 아닐 때, 품질이 극도로 좋으면(5/5) Floor 적용 검토
+            # When no veto, consider applying floor if quality is perfect (5/5)
             if ensemble_signal < strategic_floor and score >= 5:
                 report["apply_floor"] = True
                 audit_log.append(f"  SPG Floor 적용 대상 탐지: {ensemble_signal:.3f} < Floor {strategic_floor:.3f}")

@@ -452,7 +452,12 @@ def run_ablation(
 
 
 def _extract_edge_effects(audit_log: List[str]) -> Dict[str, Any]:
-    """Extract edge effect information from audit log."""
+    """Extract edge effect information from audit log.
+
+    ``GraphOrchestrator`` Phase 3 logs use Korean labels alongside arrows:
+    ``시너지`` = synergy, ``억제`` = suppress, ``연속전이`` = continuous edge transfer.
+    Phase 1 override logs may include the English substring ``Decay``.
+    """
     effects = {}
     for line in audit_log:
         if "→" in line and ("시너지" in line or "억제" in line or "연속전이" in line or "Decay" in line):

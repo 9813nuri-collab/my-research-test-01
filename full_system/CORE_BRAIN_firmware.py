@@ -1,18 +1,23 @@
 """
 H-PIOS v8.5 — Brain Firmware Generator
 ========================================
-8개 지식원천 파일(models.py, engine_core.py, optimizer.py,
-DATA_WEIGHTS_optimized.json, 4개 DATA_JSON_*_master.json)을 하나의 통합 인지 커널로
-증류(distill)하여, 에이전트의 System Prompt에 주입할 수 있는
-'뇌 펌웨어' 텍스트를 생성합니다.
+Distills 8 knowledge source files (models.py, engine_core.py, optimizer.py,
+DATA_WEIGHTS_optimized.json, and 4 DATA_JSON_*_master.json) into a unified
+cognitive kernel, generating a 'Brain Firmware' text that can be injected
+into the agent's System Prompt.
 
-설계 원칙
+Design Principles
 ---------
-- 단순 RAG가 아닌, 지식의 '내재화' — 에이전트가 12인 거장의 사고방식을 체화
-- 8개 파일의 유기적 관계를 보존 — 시냅스(Logical_Edge), 위계(4-Phase),
-  학습 원칙(Philosophy Inertia)이 모두 포함
-- Gemini 100만 토큰 컨텍스트 대비 <1% 사용으로 공간 제약 없음
-- 동적 생성 — 소스 파일 변경 시 자동 반영
+- Not simple RAG, but 'internalization' of knowledge — the agent embodies
+  the thinking patterns of 12 investment masters
+- Preserves organic relationships across 8 files — synapses (Logical_Edge),
+  hierarchy (4-Phase), and learning principles (Philosophy Inertia) all included
+- Uses <1% of Gemini's 1M token context window, no space constraints
+- Dynamic generation — automatically reflects source file changes
+
+Note: The generated firmware body (LAYER 0–4 text returned to callers) is mostly
+Korean so downstream agents match the intended locale; only Python comments and
+docstrings in this module are English.
 """
 
 from __future__ import annotations
@@ -30,29 +35,30 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 
 
 # ══════════════════════════════════════════════════════════
-# 유틸리티
+# Utilities
 # ══════════════════════════════════════════════════════════
 
 def _load_json(filename: str) -> dict:
-    """프로젝트 루트에서 JSON 파일을 로드합니다."""
+    """Loads a JSON file from the project root."""
     path = _PROJECT_ROOT / filename
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 # ══════════════════════════════════════════════════════════
-# LAYER 0: 인지 문법 (models.py 기반)
+# LAYER 0: Cognitive Grammar (based on models.py)
 # ══════════════════════════════════════════════════════════
 
 def _build_layer0() -> str:
-    """models.py에서 추출한 인지 문법 레이어."""
+    """Cognitive grammar layer extracted from models.py."""
 
-    # MarketRegime을 직접 import하여 동적으로 추출
+    # Dynamically extract by directly importing MarketRegime
     try:
         from CORE_MODELS_models import MarketRegime, RelationshipType
         regimes = [f"  - {r.value}" for r in MarketRegime]
         relationships = [f"  - {r.value}: " for r in RelationshipType]
     except ImportError:
+        # KO fallback lines if models import fails (EN: import failed — list omitted)
         regimes = ["  (models.py import 실패 — MarketRegime 목록 생략)"]
         relationships = ["  (models.py import 실패 — RelationshipType 목록 생략)"]
 
@@ -93,14 +99,14 @@ def _build_layer0() -> str:
 
 
 # ══════════════════════════════════════════════════════════
-# LAYER 1: 전문 지식 영역 (4개 Master JSON 기반)
+# LAYER 1: Domain Expertise (based on 4 Master JSONs)
 # ══════════════════════════════════════════════════════════
 
 def _format_node(node: dict) -> str:
-    """단일 마스터 노드를 텍스트로 포맷합니다."""
+    """Formats a single master node into text."""
     intel = node["Intelligence_Structure"]
 
-    # Step 1: 정량 지표
+    # Step 1: Quantitative metrics
     metrics_lines = []
     for m in intel["Step_1_Quantitative_Analysis"]["metrics"]:
         formula_str = f' → {m["logic_formula"]}' if m.get("logic_formula") else ""
@@ -111,7 +117,7 @@ def _format_node(node: dict) -> str:
         )
     metrics_text = "\n".join(metrics_lines)
 
-    # Step 2: 정성 시나리오
+    # Step 2: Qualitative scenarios
     scenarios_lines = []
     for s in intel["Step_2_Qualitative_Context"]["scenarios"]:
         action_str = f' ⚠ {s["action"]}' if s.get("action") else ""
@@ -123,7 +129,7 @@ def _format_node(node: dict) -> str:
         )
     scenarios_text = "\n".join(scenarios_lines)
 
-    # Step 3: 보정 수식
+    # Step 3: Correction formula
     step3 = intel["Step_3_Statistical_Correction"]
     constants = step3["constants"]
     regime_perf = constants.get("regime_performance", {})
@@ -152,7 +158,7 @@ def _format_node(node: dict) -> str:
 
 
 def _format_edges(edges: list) -> str:
-    """Logical Edges를 텍스트로 포맷합니다."""
+    """Formats Logical Edges into text."""
     if not edges:
         return "    (없음)"
     lines = []
@@ -167,7 +173,7 @@ def _format_edges(edges: list) -> str:
 
 
 def _build_layer1() -> str:
-    """4개 Master JSON에서 추출한 전문 지식 레이어."""
+    """Domain expertise layer extracted from 4 Master JSONs."""
 
     json_files = [
         ("DATA_JSON_value_master.json",
@@ -229,11 +235,11 @@ def _build_layer1() -> str:
 
 
 # ══════════════════════════════════════════════════════════
-# LAYER 2: 집행 신경계 (engine_core.py 기반)
+# LAYER 2: Executive Nervous System (based on engine_core.py)
 # ══════════════════════════════════════════════════════════
 
 def _build_layer2() -> str:
-    """engine_core.py에서 추출한 집행 로직 레이어."""
+    """Execution logic layer extracted from engine_core.py."""
 
     return """━━━ LAYER 2: 집행 신경계 (Signal Resolution Hierarchy) ━━━
 출처: engine_core.py — 12인 거장의 사고를 하나의 판단으로 통합하는 실행 메커니즘
@@ -310,11 +316,11 @@ def _build_layer2() -> str:
 
 
 # ══════════════════════════════════════════════════════════
-# LAYER 3: 학습 메커니즘 (optimizer.py 기반)
+# LAYER 3: Learning Mechanism (based on optimizer.py)
 # ══════════════════════════════════════════════════════════
 
 def _build_layer3() -> str:
-    """optimizer.py에서 추출한 학습 방법론 레이어."""
+    """Learning methodology layer extracted from optimizer.py."""
 
     return """━━━ LAYER 3: 학습 메커니즘 (Philosophy Inertia Optimization) ━━━
 출처: optimizer.py — 과거 경험에서 배우되, 핵심 철학을 절대 포기하지 않는 학습 방법론
@@ -380,11 +386,11 @@ def _build_layer3() -> str:
 
 
 # ══════════════════════════════════════════════════════════
-# LAYER 4: 장기 기억 (DATA_WEIGHTS_optimized.json 기반)
+# LAYER 4: Long-Term Memory (based on DATA_WEIGHTS_optimized.json)
 # ══════════════════════════════════════════════════════════
 
 def _build_layer4() -> str:
-    """DATA_WEIGHTS_optimized.json에서 추출한 장기 기억 레이어."""
+    """Long-term memory layer extracted from DATA_WEIGHTS_optimized.json."""
 
     try:
         weights = _load_json("DATA_WEIGHTS_optimized.json")
@@ -395,7 +401,7 @@ def _build_layer4() -> str:
     attribution = weights.get("attribution", {})
     global_params = weights.get("global_parameters", {})
 
-    # 노드별 파라미터 요약
+    # Per-node parameter summary
     param_lines = []
     for name, params in nodes.items():
         wr = params.get("historical_win_rate", {})
@@ -410,7 +416,7 @@ def _build_layer4() -> str:
         )
     params_text = "\n".join(param_lines)
 
-    # 기여도 요약 (best_fit_regime 중심)
+    # Attribution summary (centered on best_fit_regime)
     attr_lines = []
     for name, attr in attribution.items():
         primary_h = attr.get("primary_horizon", 20)
@@ -425,7 +431,7 @@ def _build_layer4() -> str:
         )
     attr_text = "\n".join(attr_lines)
 
-    # 국면 분포
+    # Regime distribution
     regime_dist = global_params.get("regime_distribution", {})
     total_days = sum(regime_dist.values()) if regime_dist else 1
     dist_lines = []
@@ -465,7 +471,7 @@ def _build_layer4() -> str:
 
 
 # ══════════════════════════════════════════════════════════
-# 통합 Brain Firmware 생성
+# Unified Brain Firmware Generation
 # ══════════════════════════════════════════════════════════
 
 _FIRMWARE_HEADER = """
@@ -519,10 +525,10 @@ _FIRMWARE_FOOTER = """
 
 
 def generate_brain_firmware() -> str:
-    """8개 지식원천 파일에서 완전한 Brain Firmware를 생성합니다.
+    """Generates the complete Brain Firmware from 8 knowledge source files.
 
     Returns:
-        통합 Brain Firmware 텍스트 (System Prompt 주입용)
+        Unified Brain Firmware text (for System Prompt injection)
     """
     logger.info("Brain Firmware 생성 시작...")
 
@@ -544,9 +550,9 @@ def generate_brain_firmware() -> str:
 
     firmware = "\n\n".join(sections)
 
-    # 통계
+    # Statistics
     char_count = len(firmware)
-    estimated_tokens = char_count // 4  # 대략 4자 = 1토큰
+    estimated_tokens = char_count // 4  # roughly 4 chars = 1 token
     line_count = firmware.count("\n") + 1
 
     logger.info(
@@ -559,17 +565,17 @@ def generate_brain_firmware() -> str:
     return firmware
 
 
-# ── 캐시 ──
+# ── Cache ──
 _FIRMWARE_CACHE: Optional[str] = None
 
 
 def get_brain_firmware() -> str:
-    """Brain Firmware를 캐시하여 반환합니다.
+    """Returns the Brain Firmware with caching.
 
-    최초 호출 시 생성하고, 이후 호출에서는 캐시된 값을 반환합니다.
+    Generates on the first call and returns the cached value on subsequent calls.
 
     Returns:
-        통합 Brain Firmware 텍스트
+        Unified Brain Firmware text
     """
     global _FIRMWARE_CACHE
     if _FIRMWARE_CACHE is None:
@@ -578,9 +584,9 @@ def get_brain_firmware() -> str:
 
 
 def clear_firmware_cache() -> None:
-    """Brain Firmware 캐시를 초기화합니다.
+    """Clears the Brain Firmware cache.
 
-    소스 파일 변경 후 재생성이 필요할 때 호출합니다.
+    Call this when regeneration is needed after source file changes.
     """
     global _FIRMWARE_CACHE
     _FIRMWARE_CACHE = None
@@ -588,7 +594,7 @@ def clear_firmware_cache() -> None:
 
 
 # ══════════════════════════════════════════════════════════
-# CLI Entry Point — 단독 실행 시 Firmware 출력/저장
+# CLI Entry Point — outputs/saves Firmware when run standalone
 # ══════════════════════════════════════════════════════════
 
 if __name__ == "__main__":
@@ -599,7 +605,7 @@ if __name__ == "__main__":
 
     firmware = generate_brain_firmware()
 
-    # --save 플래그: 파일로 저장
+    # --save flag: save to file
     if len(sys.argv) > 1 and sys.argv[1] == "--save":
         output_path = _PROJECT_ROOT / "brain_firmware_output.txt"
         with open(output_path, "w", encoding="utf-8") as f:
@@ -608,7 +614,7 @@ if __name__ == "__main__":
     else:
         print(firmware)
 
-    # 통계 출력
+    # Print statistics
     char_count = len(firmware)
     line_count = firmware.count("\n") + 1
     estimated_tokens = char_count // 4
