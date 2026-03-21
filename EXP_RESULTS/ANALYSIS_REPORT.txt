@@ -1,33 +1,33 @@
 ================================================================================
-  H-PIOS 실험 결과 종합 분석 보고서 (Week 5 + Supplementary)
+  H-PIOS Experiment Results Comprehensive Analysis Report (Week 5 + Supplementary)
   Generated: 2026-03-19 (Updated: 2026-03-19 13:10)
   Total Runs: 312 (main) + 48 (fair) + 216 (k-sens) + 72 (C2-abl) = 648
 ================================================================================
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 1. 실험 실행 요약
+  Part 1. Experiment Execution Summary
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[실행된 실험]
+[Executed Experiments]
 
-  Main Experiments (312건):
-    C1 (Full Ontology):        24 scenarios × 1 rep  =  24건
-    C2 (Text Persona LLM):     24 scenarios × 3 reps =  72건
-    C3 (Flat Ontology):        24 scenarios × 1 rep  =  24건
-    C4 (Vanilla LLM):          24 scenarios × 3 reps =  72건
-    Ablations (5종 × 24):      120건
+  Main Experiments (312 runs):
+    C1 (Full Ontology):        24 scenarios × 1 rep  =  24 runs
+    C2 (Text Persona LLM):     24 scenarios × 3 reps =  72 runs
+    C3 (Flat Ontology):        24 scenarios × 1 rep  =  24 runs
+    C4 (Vanilla LLM):          24 scenarios × 3 reps =  72 runs
+    Ablations (5 types × 24):  120 runs
 
-  Supplementary Experiments (48건):
-    C1_fair (override 제거):   24 scenarios × 1 rep  =  24건
-    C3_fair (edges+override 제거): 24 scenarios × 1 rep = 24건
+  Supplementary Experiments (48 runs):
+    C1_fair (override removed):   24 scenarios × 1 rep  =  24 runs
+    C3_fair (edges+override removed): 24 scenarios × 1 rep = 24 runs
 
-  모델: gemini-3-flash-preview (temperature=0.0)
-  에러: 0건 (전수 성공)
+  Model: gemini-3-flash-preview (temperature=0.0)
+  Errors: 0 (all runs successful)
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 2. 핵심 메트릭 결과 요약
+  Part 2. Key Metrics Results Summary
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ┌────────────────────────────────┬───────────┬───────────┬────────────────┐
@@ -45,65 +45,65 @@
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 3. 핵심 발견 1: Taleb Override 독재 현상
+  Part 3. Key Finding 1: Taleb Override Dominance Phenomenon
   (The Override Dominance Phenomenon)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[현상]
+[Phenomenon]
 
-  C1/C3의 모든 비-Taleb 전문가 점수가 0.02~0.08 범위로 극단적으로 압축됨.
-  Taleb만 0.72~0.98의 고점수를 유지.
+  All non-Taleb expert scores in C1/C3 are extremely compressed to the 0.02–0.08 range.
+  Only Taleb maintains high scores of 0.72–0.98.
 
-  원인 체인:
-    1. WDSS 시나리오의 tail risk 지표가 Taleb 공식을 trigger
-    2. Taleb normalized_score = 0.72~0.98 (거의 항상 HIGH)
+  Causal chain:
+    1. WDSS scenario tail risk indicators trigger the Taleb formula
+    2. Taleb normalized_score = 0.72–0.98 (almost always HIGH)
     3. Phase 1 Soft-Shutdown: influence_factor = (1 - taleb_score)^decay_power
        → (0.15)^2.8 ≈ 0.004
-    4. 다른 11인의 점수 = 원래 점수 × 0.004 → ~0.03
+    4. Other 11 experts' scores = original score × 0.004 → ~0.03
 
-[검증: no_taleb ablation]
+[Verification: no_taleb ablation]
 
-  Taleb 제거 시 점수 변화:
-    Graham:   0.029 → 0.540 (18.6× 증가)
-    Buffett:  0.038 → 0.632 (16.6× 증가)
-    Shannon:  0.050 → 0.851 (17.0× 증가)
-    Ensemble: 0.033 → 0.754 (22.8× 증가)
+  Score changes upon Taleb removal:
+    Graham:   0.029 → 0.540 (18.6× increase)
+    Buffett:  0.038 → 0.632 (16.6× increase)
+    Shannon:  0.050 → 0.851 (17.0× increase)
+    Ensemble: 0.033 → 0.754 (22.8× increase)
 
-[시사점]
+[Implications]
 
-  이것은 버그가 아니라 시스템 설계의 의도된 동작이다.
-  단 한 명의 리스크 전문가가 전체 12인 시스템을 지배하는 현상은
-  "예측 가능한 인과성(TAF)"의 극단적 실증이다.
+  This is not a bug but intended system design behavior.
+  The phenomenon where a single risk expert dominates the entire 12-expert system
+  is an extreme empirical demonstration of "predictable causality (TAF)."
 
-  논문 관점: 이것은 구조화된 온톨로지의 양면성을 보여준다:
-  - 장점: 리스크 전문가의 판단이 결정론적으로, 예측 가능하게 전파됨
-  - 단점: 과도한 집중은 다른 전문가의 관점을 소멸시킴
+  From a paper perspective, this reveals the duality of structured ontologies:
+  - Advantage: The risk expert's judgment propagates deterministically and predictably
+  - Disadvantage: Excessive concentration eliminates other experts' perspectives
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 4. 핵심 발견 2: OFS 역전 현상
+  Part 4. Key Finding 2: OFS Reversal Phenomenon
   (The Faithfulness Paradox)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[예상 vs 실제]
+[Expected vs. Actual]
 
-  예상: C1 OFS >> C2 OFS (수식이 텍스트보다 충실할 것)
-  실제: C2 OFS (0.818) >> C1 OFS (0.632) >> C1_fair OFS (0.458)
+  Expected: C1 OFS >> C2 OFS (formulas should be more faithful than text)
+  Actual: C2 OFS (0.818) >> C1 OFS (0.632) >> C1_fair OFS (0.458)
 
-[원인 분석]
+[Root Cause Analysis]
 
-  Ground Truth는 "단순화된 온톨로지 해석"에 기반:
-    "지표가 임계값을 넘으면 HIGH, 아니면 LOW"
+  Ground Truth is based on a "simplified ontology interpretation":
+    "If the indicator exceeds the threshold → HIGH, otherwise → LOW"
 
-  그러나 실제 엔진 파이프라인은 더 복잡:
+  However, the actual engine pipeline is more complex:
     raw_score = weighted_sum(metric_checks)
     step3 = raw_score × win_rate × decay_factor
     normalized = sigmoid(step3)
     phase1 = normalized × override_factor (Taleb)
 
-  이 다단계 곱셈이 점수를 원래 "의도"에서 벗어나게 만듦.
+  This multi-stage multiplication causes scores to deviate from the original "intent."
 
-[Per-Expert OFS 비교]
+[Per-Expert OFS Comparison]
 
   ┌──────────────────┬──────────┬──────────┬──────────┐
   │ Expert           │ C1 OFS   │ C1_fair  │ C2 OFS   │
@@ -122,96 +122,97 @@
   │ RSK_THORP_001    │ 0.250    │ 0.750    │ 0.333    │
   └──────────────────┴──────────┴──────────┴──────────┘
 
-  핵심 패턴:
-  - C1 override 있을 때: 대부분 LOW로 분류 → ground truth의 LOW와 우연히 일치
-  - C1_fair: 대부분 HIGH로 분류 → ground truth의 HIGH만 일치, LOW는 실패
-  - C2: 시나리오별로 다양하게 HIGH/LOW 분류 → 가장 높은 일치율
+  Key patterns:
+  - C1 with override: Most classified as LOW → coincidentally matches LOW in ground truth
+  - C1_fair: Most classified as HIGH → matches only HIGH in ground truth, fails for LOW
+  - C2: Diverse HIGH/LOW classification per scenario → highest match rate
 
-[논문 프레이밍]
+[Paper Framing]
 
   "The Faithfulness Paradox of Exact Implementation"
 
-  수식을 정확히 실행하는 것(exact implementation)과
-  전문가의 의도를 충실히 따르는 것(intent faithfulness)은
-  같은 것이 아니다.
+  Exactly executing formulas (exact implementation) and
+  faithfully following expert intent (intent faithfulness) are
+  not the same thing.
 
-  수식 엔진은 다단계 보정(win_rate, decay, regime, override)을
-  정확히 실행하지만, 이 보정들이 원래 전문가의 "이 지표가 좋으면
-  HIGH" 라는 단순한 의도를 왜곡한다.
+  The formula engine exactly executes multi-stage corrections
+  (win_rate, decay, regime, override), but these corrections
+  distort the original expert's simple intent of
+  "if this indicator is good → HIGH."
 
-  LLM은 텍스트로 표현된 "의도"를 직관적으로 따르므로
-  의도 충실도(intent faithfulness)가 더 높다.
+  LLMs intuitively follow the "intent" expressed in text,
+  resulting in higher intent faithfulness.
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 5. 핵심 발견 3: CDI — 예상 밖의 동점
+  Part 5. Key Finding 3: CDI — Unexpected Tie
   (Differentiation Parity Under Fair Conditions)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[예상 vs 실제]
+[Expected vs. Actual]
 
-  예상: C1 CDI >> C2 CDI (구조화된 수식이 차별성을 보존)
-  실제:
-    C1 (w/ override):  CDI = 0.167 (극단적 동질화 — override 때문)
+  Expected: C1 CDI >> C2 CDI (structured formulas preserve differentiation)
+  Actual:
+    C1 (w/ override):  CDI = 0.167 (extreme homogenization — due to override)
     C1_fair:           CDI = 0.706
     C2:                CDI = 0.723
     C3_fair:           CDI = 0.683
 
-[분석]
+[Analysis]
 
-  Override 제거 후 C1_fair(0.706) ≈ C2(0.723):
-  → 구조화된 온톨로지도 LLM 페르소나만큼 전문가를 차별화한다!
+  After override removal, C1_fair (0.706) ≈ C2 (0.723):
+  → The structured ontology differentiates experts as well as LLM personas!
 
-  C3_fair(0.683) vs C1_fair(0.706):
-  → Edge가 CDI를 +0.023 증가시킴 (시너지/억제가 차별화에 기여)
+  C3_fair (0.683) vs C1_fair (0.706):
+  → Edges increase CDI by +0.023 (synergy/suppression contributes to differentiation)
 
-  이것은 긍정적 발견:
-  "구조화된 온톨로지는 — Override 없이 — LLM과 대등한 전문가 분화를 달성한다.
-  그리고 Edge 구조가 이 분화를 약간 강화한다."
+  This is a positive finding:
+  "The structured ontology — without Override — achieves expert differentiation
+  on par with LLMs. And the Edge structure slightly enhances this differentiation."
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 6. 핵심 발견 4: TAF — 예측 가능한 인과성 실증
+  Part 6. Key Finding 4: TAF — Predictable Causality Demonstrated
   (Predictable Causality Demonstrated)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[결과: 4/5 (80%) 정확]
+[Results: 4/5 (80%) Correct]
 
-  O  no_graham:      Graham 제거 → A3_TOXIC 가치 점수 감소 (predicted=decrease, actual=decrease)
-  O  no_taleb:       Taleb 제거 → 앙상블 점수 증가 (predicted=increase, actual=increase)
-  O  no_risk:        RSK 전원 제거 → 점수 분산 증가 (predicted=increase, actual=increase)
-  X  no_edges:       Edge 제거 → Graham A3 점수 증가 예측 but 실제 감소
-  O  flat_ensemble:  단순평균 → 극단 시나리오 완화 (predicted=decrease, actual=decrease)
+  O  no_graham:      Graham removed → A3_TOXIC value score decreased (predicted=decrease, actual=decrease)
+  O  no_taleb:       Taleb removed → ensemble score increased (predicted=increase, actual=increase)
+  O  no_risk:        All RSK removed → score variance increased (predicted=increase, actual=increase)
+  X  no_edges:       Edges removed → predicted Graham A3 score increase, but actual decrease
+  O  flat_ensemble:  Simple average → extreme scenario mitigation (predicted=decrease, actual=decrease)
 
-[no_edges 실패 분석]
+[no_edges Failure Analysis]
 
-  예측: Edge 제거 → Munger→Graham 할인 제거 → Graham 점수 증가
-  실제: Edge 제거 → Graham 점수 감소
+  Prediction: Edge removal → Munger→Graham discount removed → Graham score increases
+  Actual: Edge removal → Graham score decreased
 
-  원인: Override 환경에서 모든 점수가 이미 ~0.03으로 압축되어 있어
-  Edge 효과가 의미 있는 차이를 만들지 못함.
-  C1에서 Graham A3 = 0.0277, no_edges에서 = 0.0277 (동일!)
-  실제 "감소"는 다른 시나리오의 미세한 차이에 의한 것.
+  Cause: In the override environment, all scores are already compressed to ~0.03,
+  so edge effects cannot produce meaningful differences.
+  In C1, Graham A3 = 0.0277; in no_edges = 0.0277 (identical!).
+  The actual "decrease" was due to subtle differences in other scenarios.
 
-[논문 의의]
+[Paper Significance]
 
-  TAF 80%는 강력한 결과:
-  - 5개 중 4개의 사전 예측이 실현됨
-  - 특히 no_taleb ablation은 극적인 22.8배 앙상블 증가
-  - 이는 토론형 에이전트에서는 불가능한 예측
-    (LLM 에이전트 1인 제거 시 결과를 사전 예측할 수 없음)
+  TAF 80% is a strong result:
+  - 4 out of 5 a priori predictions were confirmed
+  - The no_taleb ablation in particular showed a dramatic 22.8× ensemble increase
+  - This is impossible to predict in debate-style agents
+    (The outcome of removing one LLM agent cannot be predicted a priori)
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 7. 핵심 발견 5: C2 결정론적 일관성
+  Part 7. Key Finding 5: C2 Deterministic Consistency
   (Surprising LLM Determinism at Temperature 0)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[C2 교차-반복 표준편차]
+[C2 Cross-Repetition Standard Deviation]
 
-  Buffett:  0.0000 (완전 일관)
-  Marks:    0.0000 (완전 일관)
-  Taleb:    0.0000 (완전 일관)
+  Buffett:  0.0000 (perfectly consistent)
+  Marks:    0.0000 (perfectly consistent)
+  Taleb:    0.0000 (perfectly consistent)
   Dalio:    0.0031
   Fisher:   0.0058
   Shannon:  0.0048
@@ -220,224 +221,224 @@
   Soros:    0.0185
   Lynch:    0.0190
 
-  전체 평균 cross-rep std: 0.0061
+  Overall mean cross-rep std: 0.0061
 
-[시사점]
+[Implications]
 
-  temperature=0에서 LLM(Gemini 3 Flash)은 사실상 결정론적:
-  - 3회 반복 중 점수 변동이 거의 없음
-  - 이것은 C2의 실험적 신뢰성을 강화
-  - 동시에 "LLM은 확률적이라 불안정하다"는 반론을 무력화
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 8. 핵심 발견 6: C4 (Vanilla LLM) 비교
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  C4 Ensemble 평균: 0.4659 (범위: 0.015~1.000)
-  C2 Ensemble 평균: 0.1589
-
-  C4는 개별 전문가 점수가 없으므로 OFS/CDI 비교 불가.
-  그러나 C4 vs C2 앙상블 비교:
-  - C4가 더 "관대한" 점수를 줌 (평균 0.47 vs 0.16)
-  - C2는 전문가 페르소나가 점수를 낮추는 경향
-  - 이것은 "페르소나 프레이밍이 LLM 판단에 영향을 미친다"는 증거
+  At temperature=0, the LLM (Gemini 3 Flash) is effectively deterministic:
+  - Score variation across 3 repetitions is negligible
+  - This strengthens the experimental reliability of C2
+  - Simultaneously neutralizes the counterargument that "LLMs are unstable due to stochasticity"
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 9. 논문 내러티브 재구성 제안
+  Part 8. Key Finding 6: C4 (Vanilla LLM) Comparison
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  C4 Ensemble mean: 0.4659 (range: 0.015–1.000)
+  C2 Ensemble mean: 0.1589
+
+  C4 has no individual expert scores, so OFS/CDI comparison is not possible.
+  However, comparing C4 vs C2 ensembles:
+  - C4 gives more "generous" scores (mean 0.47 vs 0.16)
+  - C2's expert personas tend to lower scores
+  - This is evidence that "persona framing influences LLM judgment"
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Part 9. Revised Paper Narrative Proposal
   (Revised Paper Narrative)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[원래 가설]
+[Original Hypotheses]
 
-  H1: 구조화된 온톨로지(C1) > 텍스트 페르소나(C2) in OFS
-  H2: 구조화된 온톨로지(C1) > 텍스트 페르소나(C2) in CDI
-  H3: 구조화된 온톨로지만 의미 있는 TAF를 보일 것
+  H1: Structured ontology (C1) > Text persona (C2) in OFS
+  H2: Structured ontology (C1) > Text persona (C2) in CDI
+  H3: Only structured ontology will show meaningful TAF
 
-[실제 결과]
+[Actual Results]
 
-  H1: 기각 — C2 OFS (0.818) >> C1 OFS (0.632) > C1_fair OFS (0.458)
-  H2: 부분 지지 — C1_fair CDI (0.706) ≈ C2 CDI (0.723), 동점
-  H3: 지지 — TAF 4/5 (80%), LLM에서는 이런 분석 자체가 불가능
+  H1: Rejected — C2 OFS (0.818) >> C1 OFS (0.632) > C1_fair OFS (0.458)
+  H2: Partially supported — C1_fair CDI (0.706) ≈ C2 CDI (0.723), a tie
+  H3: Supported — TAF 4/5 (80%), such analysis is inherently impossible with LLMs
 
-[수정된 논문 내러티브]
+[Revised Paper Narrative]
 
   Title: "The Faithfulness Paradox: When Exact Implementation
          Diverges from Expert Intent in Multi-Agent Systems"
 
   Core Thesis:
-  "수식을 정확히 실행하는 것(computational faithfulness)과
-   전문가의 의도를 충실히 따르는 것(intent faithfulness)은
-   근본적으로 다른 차원이다.
+  "Exactly executing formulas (computational faithfulness) and
+   faithfully following expert intent (intent faithfulness) are
+   fundamentally different dimensions.
 
-   구조화된 온톨로지 엔진은:
-   (a) 예측 가능한 인과적 행동(TAF 80%)을 보이지만
-   (b) 다단계 파이프라인이 원래 의도를 왜곡하며(OFS 0.458)
-   (c) 강한 Override 메커니즘이 다양성을 소멸시킨다(CDI 0.167)
+   The structured ontology engine:
+   (a) Exhibits predictable causal behavior (TAF 80%), but
+   (b) Its multi-stage pipeline distorts original intent (OFS 0.458), and
+   (c) Strong override mechanisms eliminate diversity (CDI 0.167)
 
-   LLM 페르소나 엔진은:
-   (a) 높은 의도 충실도(OFS 0.818)를 보이지만
-   (b) 인과적 해석 가능성이 없으며
-   (c) temperature=0에서도 예측 불가능한 내부 논리를 가진다
+   The LLM persona engine:
+   (a) Shows high intent faithfulness (OFS 0.818), but
+   (b) Lacks causal interpretability, and
+   (c) Has unpredictable internal logic even at temperature=0
 
-   이 Trade-off는 '어떤 방식이 더 좋은가?'가 아니라
-   '어떤 상황에서 어떤 충실도가 중요한가?'라는 질문을 열어준다."
+   This trade-off opens the question not of 'which approach is better?'
+   but 'in what context does which type of faithfulness matter?'"
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 10. Ground Truth 한계 및 보완 방안
+  Part 10. Ground Truth Limitations and Remediation
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[현재 Ground Truth의 한계]
+[Current Ground Truth Limitations]
 
-  Ground Truth v2.0은 "단순 임계값 해석"에 기반:
-    "지표가 임계값을 넘으면 → 이 전문가는 HIGH 점수를 줄 것"
+  Ground Truth v2.0 is based on "simple threshold interpretation":
+    "If the indicator exceeds the threshold → this expert will give a HIGH score"
 
-  그러나 실제 엔진은 더 복잡한 파이프라인을 거침:
-    Step 3: × win_rate (0.54~0.99) × decay_factor (0.83~1.0)
+  However, the actual engine goes through a more complex pipeline:
+    Step 3: × win_rate (0.54–0.99) × decay_factor (0.83–1.0)
     Phase 1: × override_factor (~0.004 when Taleb fires)
     Phase 2: Global Adjustment (macro weight)
     Phase 3: Synergy/Suppress
 
-  결과: Ground Truth가 "수식이 HIGH을 줄 것"이라 예측한 경우에도
-  실제 파이프라인은 multiplicative corrections로 인해 LOW를 줌.
+  Result: Even when Ground Truth predicts "the formula should give HIGH,"
+  the actual pipeline gives LOW due to multiplicative corrections.
 
-[보완 방안 (향후 작업)]
+[Remediation Options (Future Work)]
 
-  방안 A: 파이프라인 기반 Ground Truth (Pipeline-Derived GT)
-    → 실제 엔진 파이프라인 (override 없이)의 출력으로 Ground Truth 재도출
-    → C1_fair OFS = 1.0 (by definition)이 되므로 의미 없음
+  Option A: Pipeline-Derived Ground Truth
+    → Re-derive Ground Truth from the actual engine pipeline output (without override)
+    → C1_fair OFS = 1.0 (by definition), making this meaningless
 
-  방안 B: 적응적 임계값 (Adaptive Threshold)
-    → C1 점수 분포의 중앙값을 threshold로 사용
-    → 분포별 상대적 OFS를 측정
+  Option B: Adaptive Threshold
+    → Use the median of C1 score distribution as threshold
+    → Measure relative OFS per distribution
 
-  방안 C: 현재 접근을 유지하되 해석을 전환
-    → "Ground Truth = 전문가 의도의 단순화된 표현"으로 정의
-    → OFS = "의도 충실도"로 해석 (수식 정확도가 아님)
-    → 이것이 가장 정직하고 흥미로운 프레이밍
+  Option C: Maintain current approach but reframe interpretation
+    → Define "Ground Truth = simplified representation of expert intent"
+    → Interpret OFS as "intent faithfulness" (not formula accuracy)
+    → This is the most honest and interesting framing
 
-  ★ 권장: 방안 C → 논문에서 Ground Truth의 한계를 투명하게 기술하고
-     "The Faithfulness Paradox"를 핵심 기여로 삼음
+  ★ Recommendation: Option C → Transparently describe Ground Truth limitations
+     in the paper and position "The Faithfulness Paradox" as the core contribution
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 11. 논문 각 메트릭별 서술 전략
+  Part 11. Per-Metric Narrative Strategy for the Paper
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 [OFS Section Strategy]
 
-  서술 순서:
-  1. C1(override 포함) vs C2: C2가 더 높음 → 표면적으로 놀라운 결과
-  2. Override 제거 후 C1_fair: 더 낮아짐 → 파이프라인 복잡성이 원인
-  3. Ground Truth의 성격 설명: "의도 충실도" 측정임을 명확화
-  4. 결론: "수식 정확성 ≠ 의도 충실성" — The Faithfulness Paradox
+  Narrative order:
+  1. C1 (with override) vs C2: C2 is higher → a superficially surprising result
+  2. After override removal, C1_fair: even lower → pipeline complexity is the cause
+  3. Explain the nature of Ground Truth: clarify it measures "intent faithfulness"
+  4. Conclusion: "Formula accuracy ≠ Intent faithfulness" — The Faithfulness Paradox
 
-  핵심 수치:
+  Key figures:
     C2 OFS = 0.818 > C1 OFS = 0.632 > C1_fair OFS = 0.458
-    해석: LLM이 전문가의 "무엇을 해야 하는지"를 더 잘 이해
+    Interpretation: LLMs better understand experts' "what should be done"
 
 [CDI Section Strategy]
 
-  서술 순서:
-  1. C1(override) CDI = 0.167 → "Override가 다양성을 파괴"
-  2. C1_fair CDI = 0.706 ≈ C2 CDI = 0.723 → "공정한 조건에서 동점"
-  3. C3_fair CDI = 0.683 < C1_fair CDI = 0.706 → "Edge가 차별화에 기여"
-  4. 결론: "구조와 LLM 모두 유사한 수준의 전문가 분화를 달성 가능"
+  Narrative order:
+  1. C1 (override) CDI = 0.167 → "Override destroys diversity"
+  2. C1_fair CDI = 0.706 ≈ C2 CDI = 0.723 → "A tie under fair conditions"
+  3. C3_fair CDI = 0.683 < C1_fair CDI = 0.706 → "Edges contribute to differentiation"
+  4. Conclusion: "Both structure and LLMs can achieve similar levels of expert differentiation"
 
-[TAF Section Strategy — 논문의 핵심 무기]
+[TAF Section Strategy — The Paper's Key Weapon]
 
-  서술 순서:
-  1. 5개 사전 예측 중 4개 정확 (80%)
-  2. no_taleb: 22.8배 앙상블 증가 → 극적인 인과적 예측
-  3. no_risk: 전체 리스크 도메인 제거 → 예측된 분산 증가
-  4. no_edges 실패 분석: Override 환경에서의 한계 설명
-  5. 결론: "구조화된 시스템만이 이런 인과적 예측을 가능케 함"
+  Narrative order:
+  1. 4 out of 5 a priori predictions correct (80%)
+  2. no_taleb: 22.8× ensemble increase → dramatic causal prediction
+  3. no_risk: Entire risk domain removed → predicted variance increase
+  4. no_edges failure analysis: Limitations in the override environment
+  5. Conclusion: "Only structured systems enable such causal predictions"
 
-  반론 방어:
-    "C2(LLM)에서 한 페르소나를 제거하면 어떻게 되는지 사전 예측 가능한가?"
-    → 불가능. LLM의 내부 논리는 블랙박스이므로 방향성조차 예측 불가.
-    → 이것이 구조화된 시스템의 핵심 가치.
-
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 12. 최종 평가 및 논문 잠재성
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-[결과의 논문 적합성]
-
-  가설 확인 실패 → 오히려 좋은 논문이 될 가능성:
-  - "예상과 다른 결과"는 학계에서 더 흥미로운 기여
-  - "The Faithfulness Paradox"는 비자명한 발견
-  - TAF 80%는 구조화 시스템의 고유 가치를 실증
-
-[강점]
-
-  ✓ 360건의 실험 — 충분한 데이터 규모
-  ✓ 4+2 조건의 체계적 비교 — 방법론적 엄밀성
-  ✓ 5개 ablation — 인과적 분석
-  ✓ 3개 메트릭 (OFS/CDI/TAF) — 다차원 평가
-  ✓ 예상과 다른 결과 — 지적 정직성
-  ✓ temperature=0에서 LLM 거의 결정론적 — 재현성
-
-[약점 및 리스크]
-
-  ⚠ Ground Truth 편향: 단순 임계값 기반 → 투명하게 기술 필요
-  ⚠ 단일 도메인: 투자 분야에 한정 → Limitation으로 명시
-  ⚠ Taleb Override 독재: 시스템 설계 문제로 해석 가능
-  ⚠ 단일 LLM 모델: gemini-3-flash-preview만 사용
-
-[워크샵 논문 잠재성 평가]
-
-  변경 전 예상: 70% (결과가 가설을 지지한다는 가정)
-  변경 후 평가: 75%
-
-  이유:
-  - "Faithfulness Paradox"는 더 흥미로운 기여
-  - 가설이 기각된 것을 정직하게 보고하면 리뷰어 호감
-  - TAF는 여전히 강력한 차별화 요소
-  - CDI 동점은 "구조와 LLM이 보완적"이라는 건설적 결론
-
-  적합 학회:
-  - FinNLP @ EMNLP 2026 (가장 적합)
-  - NORA @ NeurIPS 2026 (방법론적 기여 강조 시)
-  - Workshop on Neuro-Symbolic AI (개념적 프레이밍 적합)
+  Counterargument defense:
+    "Can you predict a priori what happens when a persona is removed from C2 (LLM)?"
+    → Impossible. The LLM's internal logic is a black box, making even directional prediction impossible.
+    → This is the core value of structured systems.
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 13. 즉시 실행 가능한 보완 작업 (Optional Improvements)
+  Part 12. Final Assessment and Paper Potential
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[보완 1: Override-Aware Ground Truth]
-  현재 Ground Truth에 "C1_fair 환경에서의 예상값"을 추가
-  C1_fair에서 실제 점수 분포를 기반으로 adaptive threshold 적용
+[Suitability of Results for Publication]
 
-[보완 2: C2 Ablation (페르소나 제거)]
-  C2에서 특정 페르소나를 제거하고 "방향 예측 가능성"을 테스트
-  → TAF 논거의 C2 대조군으로 사용
+  Hypothesis disconfirmation → actually increases potential for a good paper:
+  - "Unexpected results" are more interesting contributions in academia
+  - "The Faithfulness Paradox" is a non-trivial discovery
+  - TAF 80% empirically demonstrates the unique value of structured systems
 
-[보완 3: 다른 LLM 모델과의 비교]
-  GPT-4, Claude 등으로 C2/C4를 반복
-  → "모델 독립적 발견인가?" 검증
+[Strengths]
 
-[보완 4: Override 감쇄 강도 민감도 분석]
-  decay_power를 1.0, 2.0, 3.0, 4.0으로 변화시켜
-  Override 강도가 시스템 행동에 미치는 영향을 정량화
+  ✓ 360 experiments — sufficient data scale
+  ✓ 4+2 conditions in systematic comparison — methodological rigor
+  ✓ 5 ablations — causal analysis
+  ✓ 3 metrics (OFS/CDI/TAF) — multi-dimensional evaluation
+  ✓ Unexpected results — intellectual honesty
+  ✓ LLM nearly deterministic at temperature=0 — reproducibility
+
+[Weaknesses and Risks]
+
+  ⚠ Ground Truth bias: Based on simple thresholds → needs transparent disclosure
+  ⚠ Single domain: Limited to the investment domain → state as a Limitation
+  ⚠ Taleb Override dominance: Can be interpreted as a system design issue
+  ⚠ Single LLM model: Only gemini-3-flash-preview used
+
+[Workshop Paper Potential Assessment]
+
+  Pre-revision estimate: 70% (assuming results support hypotheses)
+  Post-revision assessment: 75%
+
+  Reasons:
+  - "Faithfulness Paradox" is a more interesting contribution
+  - Honestly reporting hypothesis disconfirmation earns reviewer goodwill
+  - TAF remains a strong differentiating factor
+  - CDI tie supports a constructive conclusion that "structure and LLMs are complementary"
+
+  Suitable venues:
+  - FinNLP @ EMNLP 2026 (most suitable)
+  - NORA @ NeurIPS 2026 (if emphasizing methodological contribution)
+  - Workshop on Neuro-Symbolic AI (conceptually suitable framing)
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 14. 보완 실험 4: Override k 민감도 분석
+  Part 13. Immediately Actionable Supplementary Work (Optional Improvements)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Supplement 1: Override-Aware Ground Truth]
+  Add "expected values under C1_fair conditions" to the current Ground Truth
+  Apply adaptive threshold based on actual score distribution in C1_fair
+
+[Supplement 2: C2 Ablation (Persona Removal)]
+  Remove specific personas from C2 and test "directional prediction feasibility"
+  → Use as a C2 control for the TAF argument
+
+[Supplement 3: Comparison with Other LLM Models]
+  Repeat C2/C4 with GPT-4, Claude, etc.
+  → Verify whether findings are "model-independent"
+
+[Supplement 4: Override Decay Strength Sensitivity Analysis]
+  Vary decay_power across 1.0, 2.0, 3.0, 4.0 to
+  quantify the impact of override strength on system behavior
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Part 14. Supplementary Experiment 4: Override k Sensitivity Analysis
   (Override Decay Coefficient Sensitivity Analysis)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[실험 설계]
+[Experimental Design]
 
-  influence_factor = exp(-k × risk_score)에서 k값을 변화시켜
-  Override 강도가 OFS, CDI, 앙상블 점수에 미치는 영향을 정량화.
-  9개 k값 × 24 시나리오 = 216 실험 (결정론적, LLM 호출 없음).
+  Vary k in influence_factor = exp(-k × risk_score) to quantify
+  the impact of override strength on OFS, CDI, and ensemble scores.
+  9 k values × 24 scenarios = 216 experiments (deterministic, no LLM calls).
 
-[결과 테이블]
+[Results Table]
 
   ┌───────┬─────────┬─────────┬────────────┬────────────┐
   │   k   │   OFS   │   CDI   │ Ensemble   │ NonTaleb   │
@@ -453,104 +454,104 @@
   │  4.0  │ 0.6319  │ 0.1345  │   0.0227   │   0.0259   │
   │  5.0  │ 0.6319  │ 0.2082  │   0.0129   │   0.0144   │
   └───────┴─────────┴─────────┴────────────┴────────────┘
-  ★ = 현재 시스템 기본값 (k=3.5)
+  ★ = Current system default (k=3.5)
 
-[핵심 발견 1: 상전이 현상 (Phase Transition)]
+[Key Finding 1: Phase Transition Phenomenon]
 
-  k=0.5 → k=1.0에서 OFS가 0.9236 → 0.6319로 급락.
-  이것은 "상전이(phase transition)"와 유사한 현상:
+  OFS drops sharply from 0.9236 → 0.6319 between k=0.5 → k=1.0.
+  This resembles a "phase transition":
 
-    k < 1.0: Override가 온건하여 전문가 점수의 HIGH/LOW 방향이 보존됨
-             → OFS 0.92 (intent faithfulness 유지)
-    k ≥ 1.0: Override가 충분히 강해져 점수가 임계값 아래로 압축됨
-             → OFS 0.63 (의도 왜곡 시작)
+    k < 1.0: Override is moderate, preserving the HIGH/LOW direction of expert scores
+             → OFS 0.92 (intent faithfulness preserved)
+    k ≥ 1.0: Override is strong enough to compress scores below the threshold
+             → OFS 0.63 (intent distortion begins)
 
-  논문 의의: 구조화된 시스템에서 단일 파라미터(k)가
-  "의도 보존 영역"과 "의도 왜곡 영역"의 경계를 결정한다.
-  이것은 neuro-symbolic 시스템에서 하이퍼파라미터의
-  해석적 중요성을 실증한다.
+  Paper significance: In structured systems, a single parameter (k)
+  determines the boundary between "intent preservation" and "intent distortion."
+  This empirically demonstrates the interpretive importance of hyperparameters
+  in neuro-symbolic systems.
 
-[핵심 발견 2: OFS 고원 현상 (OFS Plateau)]
+[Key Finding 2: OFS Plateau Phenomenon]
 
-  k ≥ 1.0에서 OFS가 0.6319으로 완전히 일정.
-  이유: k가 증가하면 점수 크기(magnitude)는 계속 압축되지만,
-  HIGH/LOW 분류(threshold 0.5 기준)는 이미 k=1.0에서 결정됨.
-  더 큰 k는 이미 threshold 아래로 내려간 점수를 더 낮출 뿐.
+  OFS is perfectly constant at 0.6319 for k ≥ 1.0.
+  Reason: As k increases, score magnitude continues to compress,
+  but the HIGH/LOW classification (threshold 0.5) is already determined at k=1.0.
+  Larger k values only push already-below-threshold scores even lower.
 
-[핵심 발견 3: CDI의 단조 감소]
+[Key Finding 3: Monotonic Decrease of CDI]
 
-  CDI가 k 증가에 따라 체계적으로 감소:
-    k=0.5: CDI=0.631 (건강한 분화)
-    k=3.5: CDI=0.167 (극단적 동질화)
-    k=4.0: CDI=0.135 (최저점)
+  CDI systematically decreases with increasing k:
+    k=0.5: CDI=0.631 (healthy differentiation)
+    k=3.5: CDI=0.167 (extreme homogenization)
+    k=4.0: CDI=0.135 (minimum)
 
-  예외: k=5.0에서 CDI=0.208로 소폭 반등.
-  원인: 극단적 압축(mean=0.014) 환경에서 전문가간
-  미세한 차이(0.001~0.03)가 상대적으로 큰 비율 차이가 됨.
+  Exception: CDI rebounds slightly to 0.208 at k=5.0.
+  Cause: Under extreme compression (mean=0.014), subtle differences
+  between experts (0.001–0.03) become proportionally large.
 
-[핵심 발견 4: 최적 k값 도출]
+[Key Finding 4: Optimal k Value Derivation]
 
-  k=0.5일 때 OFS=0.92, CDI=0.63으로 모든 메트릭 최적.
-  현재 기본값 k=3.5는 Override 강도가 과도함.
+  At k=0.5, OFS=0.92 and CDI=0.63, all metrics are optimal.
+  The current default k=3.5 has excessive override strength.
 
-  그러나 k=0.5가 "최적"이라고 논문에서 주장하기보다는:
-  "k값에 따라 시스템의 faithfulness-diversity tradeoff가
-  결정적으로 변화한다"는 해석적 발견으로 프레이밍하는 것이 적절.
+  However, rather than claiming k=0.5 is "optimal" in the paper:
+  "The system's faithfulness-diversity tradeoff changes decisively
+  as a function of k" is a more appropriate interpretive finding.
 
-[논문 활용 전략]
+[Paper Utilization Strategy]
 
-  이 결과는 Figure로 시각화하기 매우 적합:
-    X축: k값, Y축: OFS/CDI (이중 축)
-    → k=0.5~1.0 구간의 상전이가 시각적으로 극적
+  This result is highly suitable for Figure visualization:
+    X-axis: k value, Y-axis: OFS/CDI (dual axis)
+    → The phase transition in the k=0.5–1.0 range is visually dramatic
 
-  핵심 메시지: "구조화된 시스템에서 단일 인과적 파라미터가
-  시스템 전체의 faithfulness와 diversity를 제어한다.
-  이러한 해석 가능성은 LLM 기반 시스템에서는 불가능하다."
+  Key message: "In a structured system, a single causal parameter controls
+  the entire system's faithfulness and diversity.
+  Such interpretability is impossible in LLM-based systems."
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 15. 보완 실험 1: 적응적 임계값 OFS
+  Part 15. Supplementary Experiment 1: Adaptive Threshold OFS
   (Adaptive Threshold OFS — Resolving the Paradox)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[실험 설계]
+[Experimental Design]
 
-  C1_fair 전문가 점수 분포에서 median을 구해 adaptive threshold로 사용.
-  기존 OFS(threshold=0.5)와 비교하여 임계값 의존성을 분석.
-  LLM 호출 없음 (기존 결과 재분석).
+  Compute the median from C1_fair expert score distribution and use it as an adaptive threshold.
+  Compare with fixed OFS (threshold=0.5) to analyze threshold dependency.
+  No LLM calls (re-analysis of existing results).
 
-[C1_fair 점수 분포]
+[C1_fair Score Distribution]
 
   n=288, median=0.6333, mean=0.6868, std=0.1794
   min=0.3486, max=0.9802
 
-  해석: C1_fair 전문가들은 평균적으로 0.69의 점수를 생성.
-  즉 0.5 threshold는 C1_fair에게 "너무 낮아서" 거의 모든 점수가
-  HIGH로 분류됨 → ground truth의 LOW 예측과 불일치 → OFS 하락.
+  Interpretation: C1_fair experts produce scores averaging 0.69.
+  The 0.5 threshold is "too low" for C1_fair, so nearly all scores are
+  classified as HIGH → mismatch with ground truth LOW predictions → OFS declines.
 
-[OFS 비교 테이블]
+[OFS Comparison Table]
 
   ┌──────────┬──────────────┬────────────────┬────────────┐
-  │ Condition│ OFS@0.5      │ OFS@0.633      │ 변화       │
+  │ Condition│ OFS@0.5      │ OFS@0.633      │ Change     │
   ├──────────┼──────────────┼────────────────┼────────────┤
   │ C1_fair  │ 0.4583       │ 0.8229         │ +0.365 ↑↑  │
   │ C2       │ 0.8183       │ 0.7755         │ -0.043 ↓   │
   │ C3_fair  │ 0.5139       │ 0.8785         │ +0.365 ↑↑  │
   └──────────┴──────────────┴────────────────┴────────────┘
 
-[핵심 발견: The Faithfulness Paradox의 역전!]
+[Key Finding: Reversal of The Faithfulness Paradox!]
 
-  고정 임계값 0.5: C2(0.818) >> C1_fair(0.458) — C2 승리
-  적응 임계값 0.633: C3_fair(0.879) > C1_fair(0.823) > C2(0.776) — C1/C3 승리!
+  Fixed threshold 0.5: C2 (0.818) >> C1_fair (0.458) — C2 wins
+  Adaptive threshold 0.633: C3_fair (0.879) > C1_fair (0.823) > C2 (0.776) — C1/C3 win!
 
-  패러독스가 **역전**되었다:
-  - 임계값을 C1_fair의 점수 분포에 맞추면
-    구조화된 엔진이 LLM보다 높은 OFS를 달성함
-  - C3_fair(Edge 없음)가 가장 높은 OFS = 0.879
-  - 이것은 Edge 상호작용 없이 순수 공식만으로도
-    높은 intent faithfulness를 달성할 수 있음을 의미
+  The paradox is **reversed**:
+  - When the threshold is calibrated to C1_fair's score distribution,
+    the structured engine achieves higher OFS than LLM
+  - C3_fair (no edges) achieves the highest OFS = 0.879
+  - This means that even with pure formulas alone (without edge interactions),
+    high intent faithfulness can be achieved
 
-[Per-Expert 적응적 OFS 분석]
+[Per-Expert Adaptive OFS Analysis]
 
   ┌──────────────────┬──────────────────┬──────────────────┐
   │ Expert           │ C1_fair @0.633   │ C2 @0.633        │
@@ -569,128 +570,129 @@
   │ RSK_THORP_001    │ 1.000 ★          │ 0.250 ✕          │
   └──────────────────┴──────────────────┴──────────────────┘
 
-  흥미로운 전문가별 패턴:
-  - C1_fair에서 5명의 전문가가 OFS=1.000 (완벽한 의도 일치)
-  - 그러나 MAC_SIMONS_001은 0.167 (심각한 불일치)
-    → Simons의 수식이 다른 전문가와 다른 분포를 생성
-  - C2에서 RSK_THORP_001은 0.250 (LLM이 Thorp의 의도를 못 따름)
-    → 반대로 C1_fair에서 Thorp OFS=1.000
+  Interesting per-expert patterns:
+  - In C1_fair, 5 experts achieve OFS=1.000 (perfect intent match)
+  - However, MAC_SIMONS_001 scores 0.167 (severe mismatch)
+    → Simons' formula produces a different distribution than other experts
+  - In C2, RSK_THORP_001 scores 0.250 (LLM fails to follow Thorp's intent)
+    → Conversely, C1_fair achieves Thorp OFS=1.000
 
-[논문 프레이밍 수정]
+[Paper Framing Revision]
 
-  기존: "Faithfulness Paradox — 수식이 의도를 왜곡한다"
-  수정: "Faithfulness는 측정 기준(threshold)에 민감하다"
+  Original: "Faithfulness Paradox — Formulas distort intent"
+  Revised: "Faithfulness is sensitive to measurement criteria (threshold)"
 
-  이것은 더 정교한 결론:
-  1. 고정 임계값(0.5)에서는 LLM이 더 충실해 보인다
-  2. 적응 임계값에서는 구조화 엔진이 더 충실하다
-  3. 따라서 "어느 것이 더 충실한가?"보다
-     "충실도의 정의와 측정이 결론을 결정한다"가 더 정확한 기여
+  This is a more nuanced conclusion:
+  1. Under a fixed threshold (0.5), LLMs appear more faithful
+  2. Under an adaptive threshold, the structured engine is more faithful
+  3. Therefore, "faithfulness itself is measurement-dependent" is a more
+     accurate contribution than "which one is more faithful?"
 
-  이것은 논문의 메시지를 더 강화:
-  → 단순히 "A가 B보다 낫다"가 아니라
-  → "충실도는 맥락 의존적이며, 이 의존성 자체가 발견"
+  This strengthens the paper's message:
+  → Not simply "A is better than B"
+  → But "faithfulness is context-dependent, and this dependency itself is the finding"
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 16. 보완 실험 2: C2 Ablation — LLM 페르소나 제거 인과성
+  Part 16. Supplementary Experiment 2: C2 Ablation — LLM Persona Removal Causality
   (C2 Persona Removal Causality Test)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[실험 설계]
+[Experimental Design]
 
-  C2 (Text Persona LLM)에서 특정 전문가를 제거하고
-  결과 변화의 "방향"을 사전 예측 가능한지 테스트.
-  C1 TAF(80%)와 직접 대비하기 위한 C2 대조 실험.
+  Remove specific experts from C2 (Text Persona LLM) and test
+  whether the "direction" of result changes can be predicted a priori.
+  C2 control experiment for direct comparison with C1 TAF (80%).
 
-  3개 ablation × 24 시나리오 = 72 실험 단위
-  실제 LLM API 호출: 744회 (11 또는 9 전문가/시나리오)
+  3 ablations × 24 scenarios = 72 experimental units
+  Actual LLM API calls: 744 (11 or 9 experts/scenario)
 
-[C2 TAF 결과: 0.3333 (1/3)]
+[C2 TAF Results: 0.3333 (1/3)]
 
   ┌────────────────┬──────────────┬──────────────┬──────────┐
   │ Ablation       │ Predicted    │ Actual       │ Result   │
   ├────────────────┼──────────────┼──────────────┼──────────┤
-  │ c2_no_graham   │ decrease     │ decrease     │ O 정확   │
-  │ c2_no_taleb    │ increase     │ decrease     │ X 실패   │
-  │ c2_no_risk     │ increase     │ decrease     │ X 실패   │
+  │ c2_no_graham   │ decrease     │ decrease     │ O correct│
+  │ c2_no_taleb    │ increase     │ decrease     │ X failed │
+  │ c2_no_risk     │ increase     │ decrease     │ X failed │
   └────────────────┴──────────────┴──────────────┴──────────┘
 
-[TAF 직접 비교: C1 (80%) vs C2 (33%)]
+[TAF Direct Comparison: C1 (80%) vs C2 (33%)]
 
-  이것은 논문의 핵심 무기가 될 수 있는 결과:
-  구조화된 시스템(C1)은 5개 중 4개 예측 성공,
-  LLM 시스템(C2)은 3개 중 1개만 성공.
+  This can serve as the paper's key weapon:
+  The structured system (C1) successfully predicted 4 out of 5,
+  while the LLM system (C2) succeeded in only 1 out of 3.
 
-[실패 분석: 왜 C2에서 예측이 실패하는가?]
+[Failure Analysis: Why Do Predictions Fail in C2?]
 
-  1. c2_no_taleb 실패:
-     C1에서는 Taleb 제거 → Phase 1 override 해제 → 모든 점수 상승.
-     이것은 "시스템 상호작용"에 의한 효과.
+  1. c2_no_taleb failure:
+     In C1, Taleb removal → Phase 1 override released → all scores rise.
+     This is an effect caused by "system interaction."
 
-     C2에서는 Taleb이 독립적 LLM 호출일 뿐이다.
-     Taleb을 제거해도 다른 11명의 점수에는 영향이 없다.
-     ensemble이 감소한 이유: 9개 시나리오에서 Taleb 점수 > 다른 전문가 평균.
-     즉 높은 점수 기여자를 제거하면 ensemble이 감소.
+     In C2, Taleb is merely an independent LLM call.
+     Removing Taleb has no effect on the other 11 experts' scores.
+     The ensemble decreased because in 9 scenarios, Taleb's score > other experts' mean.
+     Removing a high-scoring contributor reduces the ensemble.
 
-     핵심: C1에서 Taleb 제거의 효과는 "상호작용에 의한 해방"이고,
-     C2에서는 "단순한 기여자 제거". 이 차이가 예측 실패의 근본 원인.
+     Key point: In C1, the effect of Taleb removal is "liberation through interaction,"
+     while in C2, it is "simple contributor removal." This difference is the root cause of prediction failure.
 
-  2. c2_no_risk 실패:
-     C1에서는 RSK 전원 제거 → override 해제 → 점수 분산 극적 증가.
-     C2에서는 3명 제거 → 12명→9명으로 줄어듦 → 남은 9명의 합산.
+  2. c2_no_risk failure:
+     In C1, removing all RSK → override released → dramatic score variance increase.
+     In C2, removing 3 experts → 12→9 experts → sum of remaining 9.
 
-     점수 분산이 감소한 이유:
-     리스크 전문가들(Taleb, Shannon, Thorp)은 시나리오별로
-     극단적 점수(0.0 또는 1.0)를 자주 부여 → 분산에 기여.
-     이들을 제거하면 나머지 전문가들의 더 온건한 점수만 남아
-     오히려 분산이 감소.
+     Score variance decreased because:
+     The risk experts (Taleb, Shannon, Thorp) frequently assign
+     extreme scores (0.0 or 1.0) per scenario → contributing to variance.
+     Removing them leaves only the remaining experts' more moderate scores,
+     actually reducing variance.
 
-  3. c2_no_graham 성공:
-     이것은 가장 "단순한" 예측: Graham은 Value 도메인의
-     핵심 기여자이므로 제거 시 A3_TOXIC의 Value 점수가 감소.
-     이 예측은 상호작용 효과 없이 직접 기여에만 의존하므로
-     C2에서도 성립.
+  3. c2_no_graham success:
+     This is the simplest prediction: Graham is the core contributor
+     to the Value domain, so removal decreases A3_TOXIC's Value score.
+     This prediction depends only on direct contribution without interaction effects,
+     so it holds in C2 as well.
 
-[심층 통찰: 상호작용 효과의 존재 여부가 예측 가능성을 결정]
+[Deep Insight: The Presence of Interaction Effects Determines Predictability]
 
-  C1 TAF 성공 예측들의 공통점:
-    → 모두 "시스템 상호작용"(override, synergy, suppress)에 기반
+  Common trait of successful C1 TAF predictions:
+    → All based on "system interactions" (override, synergy, suppress)
 
-  C2 TAF 실패 예측들의 공통점:
-    → C1의 상호작용 효과를 C2에 적용했지만,
-      C2에는 그런 상호작용이 존재하지 않음
+  Common trait of failed C2 TAF predictions:
+    → Applied C1's interaction effects to C2,
+      but such interactions do not exist in C2
 
-  C2 TAF 유일한 성공:
-    → 상호작용이 아닌 "직접 기여"에 기반한 예측
+  The only C2 TAF success:
+    → Based on "direct contribution" rather than interaction
 
-  결론: 구조화된 온톨로지의 핵심 가치는
-  "전문가 간 상호작용(interaction)"을 명시적으로 모델링하여
-  그 효과를 사전 예측 가능하게 만드는 것이다.
-  LLM 시스템에서는 전문가들이 독립적으로 실행되므로
-  상호작용 기반 예측이 본질적으로 불가능하다.
+  Conclusion: The core value of structured ontologies is
+  explicitly modeling "expert interactions" to make
+  their effects predictable a priori.
+  In LLM systems, experts execute independently,
+  making interaction-based predictions inherently impossible.
 
-[논문 활용 전략]
+[Paper Utilization Strategy]
 
-  Table로 직접 대비:
+  Present as a direct comparison table:
     "C1 TAF: 80% (4/5) vs C2 TAF: 33% (1/3)"
 
-  핵심 메시지:
-    "구조화된 시스템은 컴포넌트 제거의 방향을 80% 정확도로 예측 가능.
-    LLM 시스템은 33%로, 무작위 추측(50%)보다도 낮다.
-    이것은 구조화된 시스템의 고유한 인과적 해석 가능성을 실증한다."
+  Key message:
+    "The structured system can predict the direction of component removal
+    with 80% accuracy. The LLM system achieves 33%, which is lower than
+    random guessing (50%). This empirically demonstrates the unique
+    causal interpretability of structured systems."
 
-  주의: C2 TAF 33%가 50% 미만이라는 점은 흥미롭지만,
-  n=3으로 통계적 유의미성을 주장하기는 어렵다.
-  논문에서는 "방향적 경향"으로 서술하되,
-  C1의 극적인 인과 효과(22.8× 증가)와 대비하는 것이 효과적.
+  Note: While C2 TAF 33% being below 50% is intriguing,
+  statistical significance cannot be claimed with n=3.
+  In the paper, describe as a "directional tendency" while
+  contrasting with C1's dramatic causal effects (22.8× increase).
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 17. 보완 실험 종합 — 업데이트된 핵심 결과 테이블
+  Part 17. Supplementary Experiments Synthesis — Updated Key Results Table
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[업데이트된 종합 메트릭]
+[Updated Comprehensive Metrics]
 
   ┌────────────────────┬──────────┬──────────┬──────────┬──────────┐
   │ Condition          │ OFS@0.5  │ OFS@0.633│ CDI      │ TAF      │
@@ -703,77 +705,77 @@
   │ C3_fair (no ovr.)  │ 0.514    │ 0.879    │ 0.683    │    -     │
   └────────────────────┴──────────┴──────────┴──────────┴──────────┘
 
-[보완 실험이 기존 발견을 어떻게 강화하는가]
+[How Supplementary Experiments Strengthen Existing Findings]
 
-  1. Faithfulness Paradox → 더 정교한 이해로 발전
-     - 기존: "C2 > C1, paradox 존재"
-     - 보완 후: "paradox는 임계값 의존적.
-       적응 임계값에서는 C1_fair > C2.
-       충실도 자체가 측정 의존적이라는 메타 발견."
+  1. Faithfulness Paradox → Evolved into a more nuanced understanding
+     - Original: "C2 > C1, paradox exists"
+     - After supplements: "The paradox is threshold-dependent.
+       Under adaptive threshold, C1_fair > C2.
+       The meta-finding is that faithfulness itself is measurement-dependent."
 
-  2. Override 메커니즘 → 정량적 민감도 확보
-     - 기존: "Override가 점수를 압축함"
-     - 보완 후: "k=0.5 → 1.0 구간에 상전이 존재.
-       단일 파라미터가 시스템의 faithfulness를 결정적으로 제어.
-       이것은 OFS 92% → 63% 급락으로 정량화됨."
+  2. Override Mechanism → Quantitative sensitivity established
+     - Original: "Override compresses scores"
+     - After supplements: "A phase transition exists at k=0.5 → 1.0.
+       A single parameter decisively controls system faithfulness.
+       This is quantified as an OFS drop from 92% → 63%."
 
-  3. TAF 차별성 → 직접 대비 데이터 확보
-     - 기존: "C1 TAF 80%, C2에서는 TAF 자체가 불가능"
-     - 보완 후: "C1 TAF 80% vs C2 TAF 33%.
-       C2에서도 TAF를 시도했지만, 상호작용 기반 예측은 실패.
-       직접 기여 기반 예측만 성공 → 상호작용 모델링의 가치 실증."
+  3. TAF Differentiability → Direct comparison data obtained
+     - Original: "C1 TAF 80%, TAF itself is impossible in C2"
+     - After supplements: "C1 TAF 80% vs C2 TAF 33%.
+       TAF was attempted in C2 as well, but interaction-based predictions failed.
+       Only direct-contribution-based predictions succeeded → demonstrates the value of interaction modeling."
 
-[업데이트된 워크샵 논문 잠재성 평가]
+[Updated Workshop Paper Potential Assessment]
 
-  변경 전: 75%
-  변경 후: 80%
+  Pre-supplement: 75%
+  Post-supplement: 80%
 
-  상승 이유:
-  - 보완 실험이 기존 발견을 "정량적으로" 강화
-  - k 민감도 분석 → 시각적으로 설득력 있는 Figure 가능
-  - 적응적 OFS → 방법론적 기여 추가
-  - C1 TAF vs C2 TAF 직접 비교 → 가장 강력한 차별화 논거
-  - 전체 실험 규모: 360 + 216 + 72 = 648건 (보완 포함)
-    + 실제 LLM API 호출: ~1,800+ (충분한 규모)
+  Reasons for increase:
+  - Supplementary experiments "quantitatively" strengthen existing findings
+  - k sensitivity analysis → enables visually compelling Figures
+  - Adaptive OFS → additional methodological contribution
+  - C1 TAF vs C2 TAF direct comparison → strongest differentiating argument
+  - Total experimental scale: 360 + 216 + 72 = 648 runs (including supplements)
+    + Actual LLM API calls: ~1,800+ (sufficient scale)
 
-[남은 약점]
+[Remaining Weaknesses]
 
-  - C2 TAF n=3은 통계적 유의미성 부족 → "경향" 수준으로 서술
-  - MAC_SIMONS_001 OFS 이상치 (적응 임계값에서도 0.167) → 개별 분석 필요
-  - RSK_THORP_001 C2 OFS 극도로 낮음 (0.25~0.33) → LLM의 특정 전문가 이해 한계
+  - C2 TAF n=3 lacks statistical significance → describe as "tendency" level
+  - MAC_SIMONS_001 OFS outlier (0.167 even with adaptive threshold) → requires individual analysis
+  - RSK_THORP_001 C2 OFS extremely low (0.25–0.33) → LLM's limitation in understanding specific experts
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Part 18. 실험 비용 및 재현성 정보
+  Part 18. Experimental Cost and Reproducibility Information
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-[LLM API 호출 현황 (2026-03-19)]
+[LLM API Call Summary (2026-03-19)]
 
-  Main experiments (C2+C4):      ~936 호출 (72+72 시나리오 × 12 전문가)
-  Supp 2 C2 Ablation:            ~744 호출 (72 시나리오 × 평균 ~10.3 전문가)
-  1차 실행 유실분 (killed):       ~330 호출 (중복, 결과 미저장)
+  Main experiments (C2+C4):      ~936 calls (72+72 scenarios × 12 experts)
+  Supp 2 C2 Ablation:            ~744 calls (72 scenarios × avg ~10.3 experts)
+  1st run lost (killed):         ~330 calls (duplicates, results not saved)
 
-  일일 총합: ~1,800+ API 호출
-  모델: gemini-3-flash-preview (temperature=0.0)
+  Daily total: ~1,800+ API calls
+  Model: gemini-3-flash-preview (temperature=0.0)
 
-[결정론적 실험 (LLM 호출 없음)]
+[Deterministic Experiments (No LLM Calls)]
 
-  Main C1/C3/Ablation:           168건
-  Supp C1_fair/C3_fair:           48건
-  Supp 4 k-sensitivity:          216건
-  Supp 1 adaptive threshold:      0건 (기존 데이터 재분석)
+  Main C1/C3/Ablation:           168 runs
+  Supp C1_fair/C3_fair:           48 runs
+  Supp 4 k-sensitivity:          216 runs
+  Supp 1 adaptive threshold:      0 runs (re-analysis of existing data)
 
-[재현성]
+[Reproducibility]
 
-  - 결정론적 실험: 100% 재현 가능
-  - LLM 실험: temperature=0에서 교차반복 std=0.006 → 사실상 결정론적
-  - 모든 결과 JSON 파일이 EXP_RESULTS/에 저장됨
+  - Deterministic experiments: 100% reproducible
+  - LLM experiments: Cross-rep std=0.006 at temperature=0 → effectively deterministic
+  - All result JSON files are stored in EXP_RESULTS/
 
 
 ================================================================================
-  보고서 작성: Claude (Cursor AI Agent)
-  데이터 소스: EXP_RESULTS/ 내 10개 결과 파일
-  기반: EXP_PLAN.txt, PAPER_PLAN.txt
-  총 실험 규모: 648건 (main 312 + supp_fair 48 + supp_k 216 + supp_c2abl 72)
-  작성일: 2026-03-19 (보완 실험 결과 추가: 2026-03-19 13:10)
+  Report authored by: Claude (Cursor AI Agent)
+  Data source: 10 result files in EXP_RESULTS/
+  Based on: EXP_PLAN.txt, PAPER_PLAN.txt
+  Total experiment scale: 648 runs (main 312 + supp_fair 48 + supp_k 216 + supp_c2abl 72)
+  Date: 2026-03-19 (supplementary results added: 2026-03-19 13:10)
 ================================================================================
