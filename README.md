@@ -136,7 +136,8 @@ Measures causal interpretability by testing whether pre-registered predictions a
 ```
 TAF = correct_predictions / total_predictions
 ```
-Unlike OFS, which relies on ontology-derived directional expectations as ground truth, CDI is computed directly from expert score correlations and does not require external labels. TAF evaluates causal interpretability using pre-registered predictions about intervention effects rather than dataset-level ground truth.
+
+Unlike OFS, which relies on ontology-derived directional expectations as ground truth (applied identically across ontology-based and LLM persona conditions), CDI is computed directly from expert score correlations and does not require external labels. TAF evaluates causal interpretability using pre-registered predictions about intervention effects rather than dataset-level ground truth.
 
 ## Reproducing Experiments
 
