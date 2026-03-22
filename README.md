@@ -117,6 +117,7 @@ OFS = (1/N) Σ 𝟙[sign(sᵢ − τ) = expectedᵢ]
 ```
 
 where τ is the decision threshold, sᵢ is the expert's score, and expectedᵢ is the ground truth label.
+Ground truth labels represent directional expectations derived from each expert’s ontology specification (e.g., whether a scenario should be evaluated as bullish or bearish according to that expert’s decision rules). These expectations operationalize schema-level expert intent rather than empirical market correctness, and are applied identically across all conditions (ontology and LLM persona) to ensure fair comparison of implementation faithfulness.
 
 ### Cross-Expert Differentiation Index (CDI)
 
@@ -135,6 +136,7 @@ Measures causal interpretability by testing whether pre-registered predictions a
 ```
 TAF = correct_predictions / total_predictions
 ```
+Unlike OFS, which relies on ontology-derived directional expectations as ground truth, CDI is computed directly from expert score correlations and does not require external labels. TAF evaluates causal interpretability using pre-registered predictions about intervention effects rather than dataset-level ground truth.
 
 ## Reproducing Experiments
 
