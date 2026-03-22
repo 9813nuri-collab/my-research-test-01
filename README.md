@@ -116,7 +116,7 @@ Measures whether each expert's output aligns with the direction (bullish/bearish
 OFS = (1/N) Σ 𝟙[sign(sᵢ − τ) = expectedᵢ]
 ```
 
-where τ is the decision threshold, sᵢ is the expert's score, and expectedᵢ is the ground truth label.
+where τ is the decision threshold, sᵢ is the expert's score, and expectedᵢ is the ground truth label.    
 Ground truth labels represent directional expectations derived from each expert’s ontology specification (e.g., whether a scenario should be evaluated as bullish or bearish according to that expert’s decision rules). These expectations operationalize schema-level expert intent rather than empirical market correctness, and are applied identically across all conditions (ontology and LLM persona) to ensure fair comparison of implementation faithfulness.
 
 ### Cross-Expert Differentiation Index (CDI)
