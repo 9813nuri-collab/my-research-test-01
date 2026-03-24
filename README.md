@@ -4,6 +4,22 @@
 
 This repository contains the source code, data, and experimental results for reproducing the findings presented in our paper. We propose three evaluation metrics (OFS, CDI, TAF) for multi-expert AI systems and discover a *Faithfulness Paradox* where evaluation conclusions reverse depending on threshold choice.
 
+---
+
+### Update: Threshold-Independent Faithfulness Analysis (ROC-AUC)
+
+A supplementary ROC-AUC analysis resolves the Faithfulness Paradox without relying on any threshold choice. The results reveal a **two-level structure**: the formula engine without override achieves ROC-AUC = **0.971**, substantially exceeding LLM personas (0.898) — demonstrating that the structured system is inherently *more* faithful at discriminating ground-truth expert intent. The apparent faithfulness deficit (C1 AUC = 0.746) is entirely attributable to the Taleb Master Override, which deliberately collapses all expert scores under tail-risk conditions as an intended system-level risk control. Individual-level evaluation metrics register this system-level design feature as a faithfulness failure, exposing a **measurement-level mismatch** that may generalize to any multi-agent system where interaction rules intentionally override individual component outputs.
+
+<p align="center">
+  <img src="EXP_RESULTS/fig_roc_auc.png" width="48%" alt="ROC Curves"/>
+  &nbsp;
+  <img src="EXP_RESULTS/fig_ofs_threshold_sweep.png" width="48%" alt="OFS Threshold Sweep"/>
+</p>
+
+*Left: ROC curves showing threshold-independent faithfulness. C1_fair (no override) dominates all conditions. Right: OFS vs. threshold τ showing the crossover point where structured systems surpass LLM personas. See [`ROC_AUC_ANALYSIS_REPORT.txt`](EXP_RESULTS/ROC_AUC_ANALYSIS_REPORT.txt) for full analysis.*
+
+---
+
 ## Overview
 
 We study how faithfulness should be evaluated in multi-expert AI systems where domain knowledge is encoded either as **executable ontologies** (structured formulas + interaction rules) or as **LLM persona descriptions** (natural language). Our key findings:
@@ -49,6 +65,10 @@ We study how faithfulness should be evaluated in multi-expert AI systems where d
 | `supp2_c2_taf_*.json`, `supp2_partial/` | C2 per-expert ablation results |
 | `generate_figures.py` | Regenerate all paper figures |
 | `fig_*.png` | Pre-generated figures |
+| `analysis_auc.py` | Threshold-independent ROC-AUC and OFS-τ sweep analysis |
+| `fig_roc_auc.png` | ROC curves for C1/C1_fair/C3/C3_fair/C2 with AUC values |
+| `fig_ofs_threshold_sweep.png` | OFS vs. decision threshold τ (Paradox reversal visualization) |
+| `ROC_AUC_ANALYSIS_REPORT.txt` | Detailed ROC-AUC findings and two-level Paradox interpretation |
 
 ### Full System (`full_system/`) — supplementary
 
@@ -171,16 +191,16 @@ Figures are saved as `EXP_RESULTS/fig_*.png`.
 
 ## Key Results
 
-| Condition | OFS (τ=0.5) | OFS (τ=0.633) | CDI | TAF |
-|-----------|-------------|---------------|------|-----|
-| C1 (Full Ontology) | 0.632 | 0.924 | 0.167 | 4/5 (80%) |
-| C1_fair (no override) | 0.458 | 0.819 | 0.706 | -- |
-| C2 (Text Persona) | 0.818 | 0.778 | 0.723 | 1/3 (33%) |
-| C3 (Flat Ontology) | 0.632 | -- | 0.160 | -- |
-| C3_fair (no override) | 0.514 | -- | 0.683 | -- |
-| C4 (Vanilla LLM) | N/A | N/A | N/A | -- |
+| Condition | OFS (τ=0.5) | OFS (τ=0.633) | ROC-AUC | CDI | TAF |
+|-----------|-------------|---------------|---------|------|-----|
+| C1 (Full Ontology) | 0.632 | 0.924 | 0.746 | 0.167 | 4/5 (80%) |
+| C1_fair (no override) | 0.458 | 0.819 | **0.971** | 0.706 | -- |
+| C2 (Text Persona) | 0.818 | 0.778 | 0.898 | 0.723 | 1/3 (33%) |
+| C3 (Flat Ontology) | 0.632 | -- | 0.750 | 0.160 | -- |
+| C3_fair (no override) | 0.514 | -- | 0.939 | 0.683 | -- |
+| C4 (Vanilla LLM) | N/A | N/A | N/A | N/A | -- |
 
-The **Faithfulness Paradox**: At τ=0.5, C2 (LLM) > C1 (Ontology) in OFS. At τ=0.633 (adaptive), this reverses: C1 > C2.
+The **Faithfulness Paradox**: At τ=0.5, C2 (LLM) > C1 (Ontology) in OFS. At τ=0.633 (adaptive), this reverses: C1 > C2. A threshold-independent ROC-AUC analysis further confirms that the formula engine without override (C1_fair, AUC = 0.971) surpasses LLM personas (C2, AUC = 0.898), while the full override condition (C1, AUC = 0.746) reflects intended system-level score suppression rather than intrinsic rule execution error.
 
 ## License
 
