@@ -6,9 +6,22 @@ This repository contains the source code, data, and experimental results for rep
 
 ---
 
-### 🚨Update: Threshold-Independent Faithfulness Analysis (ROC-AUC)
+### 🚨 Post-Submission Update: Solving the Faithfulness Paradox (ROC-AUC)
 
-A supplementary ROC-AUC analysis resolves the Faithfulness Paradox without relying on any threshold choice. The results reveal a **two-level structure**: the formula engine without override achieves ROC-AUC = **0.971**, substantially exceeding LLM personas (0.898) — demonstrating that the structured system is inherently *more* faithful at discriminating ground-truth expert intent. The apparent faithfulness deficit (C1 AUC = 0.746) is entirely attributable to the Taleb Master Override, which deliberately collapses all expert scores under tail-risk conditions as an intended system-level risk control. Individual-level evaluation metrics register this system-level design feature as a faithfulness failure, exposing a **measurement-level mismatch** that may generalize to any multi-agent system where interaction rules intentionally override individual component outputs.
+> **"Structured systems may appear less faithful under individual-level metrics precisely because they faithfully enforce system-level interaction constraints."**
+
+A supplementary **ROC-AUC analysis** resolves the Faithfulness Paradox by removing threshold bias.
+
+* **Intrinsic Superiority**: Without override, the structured engine achieves **ROC-AUC = 0.971**, significantly outperforming LLM personas (0.898).
+* **Structural Trade-off**: The apparent faithfulness deficit in C1 (AUC 0.746) is a **deliberate feature**, not a failure. It stems from the *Taleb Master Override*, which faithfully enforces systemic risk control by suppressing individual signals under tail-risk.
+
+This reveals a critical **measurement-level mismatch**: individual-level metrics penalize the very interaction rules that ensure systemic safety. This insight is vital for any multi-agent system where safety constraints must override component outputs.
+
+| Fig 1. ROC Analysis (Threshold-Independent) | Fig 2. OFS Threshold Sweep (Crossover Point) |
+| :---: | :---: |
+| ![ROC AUC](./EXP_RESULTS/fig_roc_auc.png) | ![OFS Sweep](./EXP_RESULTS/fig_ofs_threshold_sweep.png) |
+
+---
 
 <p align="center">
   <img src="EXP_RESULTS/fig_roc_auc.png" width="48%" alt="ROC Curves"/>
