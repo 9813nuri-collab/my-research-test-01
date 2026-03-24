@@ -773,9 +773,6 @@
 
 
 ================================================================================
-  Report authored by: Claude (Cursor AI Agent)
   Data source: 10 result files in EXP_RESULTS/
-  Based on: EXP_PLAN.txt, PAPER_PLAN.txt
   Total experiment scale: 648 runs (main 312 + supp_fair 48 + supp_k 216 + supp_c2abl 72)
-  Date: 2026-03-19 (supplementary results added: 2026-03-19 13:10)
 ================================================================================
