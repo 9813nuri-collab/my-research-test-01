@@ -6,7 +6,7 @@ This repository contains the source code, data, and experimental results for rep
 
 ---
 
-### Update: Threshold-Independent Faithfulness Analysis (ROC-AUC)
+### 🚨Update: Threshold-Independent Faithfulness Analysis (ROC-AUC)
 
 A supplementary ROC-AUC analysis resolves the Faithfulness Paradox without relying on any threshold choice. The results reveal a **two-level structure**: the formula engine without override achieves ROC-AUC = **0.971**, substantially exceeding LLM personas (0.898) — demonstrating that the structured system is inherently *more* faithful at discriminating ground-truth expert intent. The apparent faithfulness deficit (C1 AUC = 0.746) is entirely attributable to the Taleb Master Override, which deliberately collapses all expert scores under tail-risk conditions as an intended system-level risk control. Individual-level evaluation metrics register this system-level design feature as a faithfulness failure, exposing a **measurement-level mismatch** that may generalize to any multi-agent system where interaction rules intentionally override individual component outputs.
 
