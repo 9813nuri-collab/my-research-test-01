@@ -21,14 +21,6 @@ This reveals a critical **measurement-level mismatch**: individual-level metrics
 | :---: | :---: |
 | ![ROC AUC](./EXP_RESULTS/fig_roc_auc.png) | ![OFS Sweep](./EXP_RESULTS/fig_ofs_threshold_sweep.png) |
 
----
-
-<p align="center">
-  <img src="EXP_RESULTS/fig_roc_auc.png" width="48%" alt="ROC Curves"/>
-  &nbsp;
-  <img src="EXP_RESULTS/fig_ofs_threshold_sweep.png" width="48%" alt="OFS Threshold Sweep"/>
-</p>
-
 *Left: ROC curves showing threshold-independent faithfulness. C1_fair (no override) dominates all conditions. Right: OFS vs. threshold τ showing the crossover point where structured systems surpass LLM personas. See [`ROC_AUC_ANALYSIS_REPORT.txt`](EXP_RESULTS/ROC_AUC_ANALYSIS_REPORT.txt) for full analysis.*
 
 ---
