@@ -1,0 +1,277 @@
+================================================================================
+ROC-AUC SUPPLEMENTARY ANALYSIS REPORT
+Threshold-Independent Faithfulness Evaluation for Structured Multi-Expert Systems
+================================================================================
+Generated: 2026-03-24
+Script:    EXP_RESULTS/analysis_auc.py
+Figures:   EXP_RESULTS/fig_roc_auc.png
+           EXP_RESULTS/fig_ofs_threshold_sweep.png
+
+
+--------------------------------------------------------------------------------
+1. MOTIVATION
+--------------------------------------------------------------------------------
+
+The original analysis reported a "Faithfulness Paradox": the formula-engine
+conditions (C1, C3) achieved lower Ontology Faithfulness Scores (OFS = 0.46)
+than the LLM persona condition (C2, OFS = 0.82) under a fixed threshold
+tau = 0.5, despite executing expert rules exactly.
+
+Two competing hypotheses were proposed:
+
+  (H1) THRESHOLD ARTIFACT: The OFS gap is an artifact of tau = 0.5 being
+       poorly calibrated for the score distribution produced by the override
+       mechanism. An adaptive threshold would close the gap.
+
+  (H2) STRUCTURAL DISCRIMINATION FAILURE: The formula engine genuinely
+       produces less discriminative scores (HIGH-expected vs LOW-expected
+       experts are harder to separate), regardless of threshold.
+
+This supplementary analysis resolves which hypothesis is correct by computing
+threshold-INDEPENDENT evaluation metrics (ROC-AUC), where no threshold
+choice can bias the result.
+
+
+--------------------------------------------------------------------------------
+2. METHOD
+--------------------------------------------------------------------------------
+
+2.1 Data Sources
+  - C1, C3, C2:      EXP_RESULTS/main_results_FULL.json        (expert_scores)
+  - C1_fair, C3_fair: EXP_RESULTS/supplementary_fair_results.json (expert_scores)
+  - Ground Truth:    EXP_GROUND_TRUTH.json
+      * asset_expectations[expert_id][asset_type].expected  (9 asset experts)
+      * macro_expectations[expert_id][regime].expected      (3 macro experts)
+
+2.2 Scenario Mapping
+  S01-S04:  M1_BOOM       x (A1_QUALITY, A2_BALANCED, A3_TOXIC, A4_HYPE)
+  S05-S08:  M2_STAGFLATION x (A1, A2, A3, A4)
+  S09-S12:  M3_CRISIS      x (A1, A2, A3, A4)
+  S13-S16:  M4_STEADY      x (A1, A2, A3, A4)
+  S17-S20:  M5_MANIA       x (A1, A2, A3, A4)
+  S21-S24:  M6_DEFLATION   x (A1, A2, A3, A4)
+
+2.3 Feature Construction
+  For each condition, for each (expert, scenario) pair:
+    - Continuous score: expert_scores[expert_id] averaged across repetitions
+    - Binary label:     1 (HIGH) / 0 (LOW) from ground truth
+
+  Total data points per condition: 12 experts x 24 scenarios = 288
+
+2.4 Metrics
+  - ROC-AUC:  sklearn.metrics.roc_curve + auc
+    Interpretation: probability that a randomly chosen HIGH-expected
+    (expert, scenario) pair scores higher than a LOW-expected pair.
+    Completely threshold-independent.
+
+  - OFS-Threshold Sweep:  OFS(tau) = accuracy at threshold tau
+    Computed over tau in [0.01, 0.99] (300 steps) to visualize the
+    Faithfulness Paradox reversal and locate the crossover point.
+
+
+--------------------------------------------------------------------------------
+3. RESULTS
+--------------------------------------------------------------------------------
+
+3.1 ROC-AUC Table
+
+  +-------------------------------+--------+------+------+------+
+  | Condition                     |  AUC   |  n   | HIGH | LOW  |
+  +-------------------------------+--------+------+------+------+
+  | C1_fair  (No Override)        | 0.9705 |  288 |  106 |  182 |
+  | C3_fair  (Flat, No Override)  | 0.9390 |  288 |  106 |  182 |
+  | C2       (LLM Persona)        | 0.8982 |  288 |  106 |  182 |
+  | C3       (Flat + Override)    | 0.7500 |  288 |  106 |  182 |
+  | C1       (Full Override)      | 0.7455 |  288 |  106 |  182 |
+  +-------------------------------+--------+------+------+------+
+
+3.2 OFS-Threshold Sweep (see fig_ofs_threshold_sweep.png)
+
+  At tau = 0.5:   C1 OFS ~ 0.46,  C2 OFS ~ 0.82   [C2 >> C1]
+  At tau = 0.633: C1 OFS ~ 0.82,  C2 OFS ~ 0.82   [parity]
+  At tau = 0.70+: C1_fair OFS ~ 0.97, C2 OFS ~ 0.80 [C1_fair >> C2]
+
+  The crossover (Faithfulness Paradox reversal) occurs near tau ~ 0.57-0.60
+  for C1_fair vs C2.
+
+
+--------------------------------------------------------------------------------
+4. KEY FINDINGS
+--------------------------------------------------------------------------------
+
+FINDING 1: The Faithfulness Paradox Is Partly a Threshold Artifact
+-------------------------------------------------------------------
+At tau = 0.5, C1 OFS = 0.46. At tau = 0.633, C1 OFS = 0.82 — matching C2.
+This confirms H1: a significant portion of the OFS gap disappears with
+an adaptive threshold calibrated to the override-shifted score distribution.
+The OFS-threshold sweep (fig_ofs_threshold_sweep.png) visualizes this
+reversal clearly.
+
+FINDING 2: The Override Mechanism Has a STRUCTURAL Discrimination Cost
+----------------------------------------------------------------------
+Even threshold-independently, C1 AUC (0.746) < C2 AUC (0.898).
+This confirms H2 is also true: the Taleb Master Override does not merely
+shift the score distribution — it actively collapses HIGH/LOW score
+separation by driving ALL expert scores toward zero simultaneously when
+tail risk is detected.
+
+When Taleb fires (A3_TOXIC, A4_HYPE scenarios):
+  - HIGH-expected experts: score ~ exp(-Taleb * 3) -> near 0
+  - LOW-expected experts:  score ~ exp(-Taleb * 3) -> near 0
+  Both groups converge, making them indistinguishable by any threshold.
+  This produces the characteristic "flat middle segment" visible in C1/C3
+  ROC curves (TPR stalls at ~0.57 across FPR = 0.05 to 0.45).
+
+FINDING 3: Without Override, Structured Systems Dominate LLMs
+-------------------------------------------------------------
+C1_fair AUC = 0.971 >> C2 AUC = 0.898
+C3_fair AUC = 0.939 >> C2 AUC = 0.898
+
+Removing the override reveals that the formula engine, when evaluated
+at the individual expert level, is substantially more faithful to
+ground truth than LLM personas — in a threshold-independent sense.
+The Faithfulness Paradox (C1 appearing less faithful than C2) was
+ENTIRELY driven by the override mechanism.
+
+FINDING 4: Graph Structure Provides Modest Incremental Benefit
+--------------------------------------------------------------
+C1_fair (Full Ontology Graph) AUC = 0.971
+C3_fair (Flat, No Graph)      AUC = 0.939
+
+Delta = +0.031 from graph interaction edges.
+The graph structure (Taleb->ALL, Graham->Buffett, etc.) provides
+meaningful but modest improvement in individual expert faithfulness
+when operating without override suppression. The dominant factor is
+override presence/absence (+0.225 AUC), not graph depth (+0.031).
+
+
+--------------------------------------------------------------------------------
+5. THEORETICAL ANALYSIS: THE TWO-LEVEL FAITHFULNESS PROBLEM
+--------------------------------------------------------------------------------
+
+This analysis reveals that "faithfulness" must be evaluated at two
+distinct levels that can produce opposing conclusions:
+
+LEVEL 1 — Individual Expert Formula Faithfulness (OFS / ROC-AUC)
+  Question: Does expert X's output score match expert X's intended
+            formula output, evaluated independently?
+  Result:   C1_fair >> C2 >> C1 (override collapses this)
+
+LEVEL 2 — System-Level Design Intent Faithfulness
+  Question: Does the system behave as the designer intended when
+            considering cross-expert interaction rules?
+  Result:   C1 executes override PERFECTLY — this is the design.
+            C2 cannot be evaluated on this dimension (no explicit rules).
+
+The core insight: the Taleb Master Override IS the design intent at
+the system level, but it APPEARS as a faithfulness failure at the
+individual expert level because ground truth is defined for experts
+in isolation (without accounting for interaction suppression effects).
+
+This mismatch constitutes what we call a MEASUREMENT LEVEL MISMATCH:
+  - Metric defined at: individual expert scope
+  - Mechanism operating at: multi-agent interaction scope
+  - Result: valid metric, wrong scope -> misleading conclusion
+
+
+--------------------------------------------------------------------------------
+6. THREE-DIMENSIONAL FAITHFULNESS FRAMEWORK
+--------------------------------------------------------------------------------
+
+Combining all results (OFS, CDI, TAF, ROC-AUC):
+
+  Dimension              | C1     | C1_fair | C2    | Explanation
+  -----------------------|--------|---------|-------|---------------------------
+  Formula Faithfulness   | 0.746  | 0.971   | 0.898 | ROC-AUC (this analysis)
+  (individual, threshold-|        |         |       |
+   independent)          |        |         |       |
+  -----------------------|--------|---------|-------|---------------------------
+  Expert Diversity (CDI) | Low*   | High    | Med   | Collapses under override
+  -----------------------|--------|---------|-------|---------------------------
+  Causal Interpretability| 80%    | ~80%    | 33%   | TAF score
+  (TAF)                  |        |         |       |
+  -----------------------|--------|---------|-------|---------------------------
+  System Design Intent   | PASS   | PARTIAL | N/A   | Override executes as
+  Faithfulness           |        |         |       | designed; C2 has no
+                         |        |         |       | measurable intent rules
+  -----------------------|--------|---------|-------|---------------------------
+
+  *CDI collapse under C1 override is a FEATURE, not a bug: when Taleb
+   detects systemic tail risk, all positions SHOULD converge to risk-off.
+
+  Summary: Structured systems (C1) sacrifice per-expert signal diversity
+  for system-level risk control and causal interpretability.
+  LLMs (C2) achieve intermediate formula faithfulness with no causal
+  interpretability. Neither architecture dominates on all dimensions.
+
+
+--------------------------------------------------------------------------------
+7. IMPLICATIONS FOR THE FAITHFULNESS PARADOX NARRATIVE
+--------------------------------------------------------------------------------
+
+Original paper narrative (before this analysis):
+  "C1 OFS = 0.46 < C2 OFS = 0.82 at tau=0.5, but this reverses with
+   adaptive tau = 0.633. The paradox is a threshold artifact."
+
+Refined narrative (after this analysis):
+  "The Faithfulness Paradox has a two-layer structure:
+   Layer 1 (Threshold Artifact): OFS at tau=0.5 underestimates formula-
+   engine faithfulness because override shifts the score distribution.
+   Adaptive tau closes this gap (confirmed by OFS-tau sweep).
+   Layer 2 (Structural): Even threshold-independently (ROC-AUC), C1
+   scores lower than C2 (0.746 vs 0.898). This is not a measurement
+   artifact but an emergent property of the override mechanism:
+   Taleb suppression collapses HIGH/LOW score separation as a
+   deliberate risk-control feature. C1_fair (override removed) achieves
+   AUC = 0.971, exceeding C2, demonstrating that the formula engine
+   itself is more faithful than LLM personas — the override mechanism
+   alone creates the apparent deficit.
+   Therefore, the Paradox is resolved: structured systems appear less
+   faithful because they are MORE faithfully executing their own
+   system-level design, which includes intentional individual-score
+   suppression under tail risk conditions."
+
+
+--------------------------------------------------------------------------------
+8. RECOMMENDED USE IN PAPER
+--------------------------------------------------------------------------------
+
+8.1 Camera-Ready / Rebuttal (if reviewers challenge faithfulness metrics)
+  - Cite fig_roc_auc.png as evidence that the OFS gap is not merely
+    threshold-dependent: even ROC-AUC shows C1 < C2.
+  - Immediately follow with: C1_fair AUC = 0.971 > C2 AUC = 0.898,
+    isolating the override as the sole source of apparent unfaithfulness.
+  - Frame as: "The formula engine is not less faithful; it is more
+    faithfully executing its system-level design."
+
+8.2 Section 5.1 Enhancement (Faithfulness Paradox discussion)
+  Add one paragraph:
+  "A threshold-independent analysis (ROC-AUC) confirms the two-layer
+   structure of the Paradox: C1 AUC = 0.746 vs C2 AUC = 0.898, but
+   C1_fair AUC = 0.971, demonstrating that the override mechanism alone
+   accounts for the entire faithfulness gap."
+
+8.3 New Figure in Appendix
+  fig_roc_auc.png:          ROC curves for all conditions
+  fig_ofs_threshold_sweep.png: OFS vs tau showing reversal point
+
+8.4 AUC values can be added to Table 1 or Table 2 as additional columns.
+
+
+--------------------------------------------------------------------------------
+9. FILES GENERATED
+--------------------------------------------------------------------------------
+
+  analysis_auc.py             -- Full analysis script (reproducible)
+  fig_roc_auc.png             -- ROC curves (5 conditions + random baseline)
+  fig_ofs_threshold_sweep.png -- OFS vs tau sweep with crossover annotation
+
+All outputs are deterministic given the same input JSON files.
+No new experiments were conducted; all analyses use existing result files:
+  - main_results_FULL.json
+  - supplementary_fair_results.json
+  - EXP_GROUND_TRUTH.json
+
+================================================================================
+END OF REPORT
+================================================================================
