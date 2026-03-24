@@ -13,7 +13,7 @@ This repository contains the source code, data, and experimental results for rep
 A supplementary **ROC-AUC analysis** resolves the Faithfulness Paradox by removing threshold bias.
 
 * **Intrinsic Superiority**: Without override, the structured engine achieves **ROC-AUC = 0.971**, significantly outperforming LLM personas (0.898).
-* **Structural Trade-off**: The apparent faithfulness deficit in C1 (AUC 0.746) is a **deliberate feature**, not a failure. It stems from the *Taleb Master Override*, which faithfully enforces systemic risk control by suppressing individual signals under tail-risk.
+* **Structural Trade-off**: 2. Structural Trade-off: The apparent faithfulness deficit (C1 AUC = 0.746) is a structural consequence of deliberate system-level risk control, rather than a failure in rule execution. It stems from the Taleb Master Override, which faithfully enforces systemic risk suppression by collapsing individual expert signals under tail-risk conditions.
 
 This reveals a critical **measurement-level mismatch**: individual-level metrics penalize the very interaction rules that ensure systemic safety. This insight is vital for any multi-agent system where safety constraints must override component outputs.
 
